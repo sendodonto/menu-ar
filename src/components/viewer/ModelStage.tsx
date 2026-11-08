@@ -76,7 +76,7 @@ export const ModelStage = forwardRef<ModelViewerElement | null, Props>(function 
         <div className="pointer-events-none absolute inset-0 grid place-items-center" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Carregando modelo 3D">
           <div className="flex w-44 flex-col items-center gap-3">
             <div className="h-[3px] w-full overflow-hidden rounded-full bg-grout">
-              <div className="h-full bg-clay transition-[width] duration-200 ease-out" style={{ width: `${Math.max(4, pct)}%` }} />
+              <div className="h-full bg-ink transition-[width] duration-200 ease-out" style={{ width: `${Math.max(4, pct)}%` }} />
             </div>
             <span className="tnum text-sm text-ink-2">Carregando modelo 3D · {pct}%</span>
           </div>

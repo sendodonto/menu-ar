@@ -87,12 +87,12 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
         <video ref={video} className="absolute max-w-none" muted playsInline aria-hidden />
       </div>
 
-      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)]">
-        <div className={`${glass} min-w-0 rounded-2xl px-4 py-2.5`}>
+      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)]">
+        <div className={`${glass} min-w-0 rounded-2xl px-4 py-2.5 ${desktop ? 'invisible' : ''}`}>
           <p className="truncate text-[15px] font-semibold leading-tight">{dish.name}</p>
           <p className="text-[13px] text-white/75">{formatPrice(dish.price)}{size ? ` · ${size}` : ''}</p>
         </div>
-        <button type="button" onClick={close} className={`${glass} press grid size-11 shrink-0 place-items-center rounded-full`} aria-label="Fechar e voltar">
+        <button type="button" onClick={close} className={`${desktop ? 'bg-black/[0.06] text-ink hover:bg-black/10' : glass} press grid size-11 shrink-0 place-items-center rounded-full`} aria-label="Fechar e voltar">
           <X size={20} />
         </button>
       </div>
@@ -103,16 +103,16 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
           <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 px-4 pb-[max(env(safe-area-inset-bottom),20px)]">
             {status && <p className={`${glass} rounded-full px-4 py-2 text-center text-[14px]`} aria-live="polite">{status}</p>}
             <div className="flex w-full max-w-sm items-center gap-2">
-              <button type="button" onClick={recenter} className={`${glass} press grid size-12 shrink-0 place-items-center rounded-full`} aria-label="Trazer o prato para onde o celular aponta" title="Trazer para cá">
-                <Crosshair size={20} />
+              <button type="button" onClick={recenter} className={`${glass} press flex h-14 w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-medium`} aria-label="Trazer o prato para onde o celular aponta">
+                <Crosshair size={19} /> Trazer
               </button>
-              <button type="button" onClick={toggle} disabled={!placed} className={`${glass} press grid size-12 shrink-0 place-items-center rounded-full disabled:opacity-40`} aria-label={hidden ? 'Mostrar o prato' : 'Ocultar o prato'} title={hidden ? 'Mostrar' : 'Ocultar'}>
-                {hidden ? <Eye size={20} /> : <EyeOff size={20} />}
+              <button type="button" onClick={toggle} disabled={!placed} className={`${glass} press flex h-14 w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-medium disabled:opacity-40`}>
+                {hidden ? <Eye size={19} /> : <EyeOff size={19} />} {hidden ? 'Mostrar' : 'Ocultar'}
               </button>
               <button
                 type="button"
                 onClick={() => { add(dish.id); toast(`${dish.name} adicionado ao pedido`); }}
-                className="press flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-[15px] font-semibold text-ink"
+                className="press flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-white px-4 text-[15px] font-semibold text-ink"
               >
                 <Plus size={18} /> Adicionar · {formatPrice(dish.price)}
               </button>
@@ -126,8 +126,9 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
           <div className="grid w-full max-w-4xl items-center gap-8 md:grid-cols-[1.2fr_1fr]">
             <ModelStage src={dish.model.src} alt={`Modelo 3D de ${dish.name}`} className="aspect-square w-full rounded-[28px] bg-tile shadow-[var(--shadow-card)]" />
             <div>
-              <h1 className="font-serif text-[34px] leading-tight text-ink">Veja na sua mesa pelo celular</h1>
-              <p className="mt-3 text-[16px] leading-relaxed text-ink-2">A câmera do celular coloca o prato sobre a sua mesa, em tamanho real. Aponte a câmera do seu celular para o código.</p>
+              <p className="text-[15px] text-ink-2">{dish.name} · <span className="tnum">{formatPrice(dish.price)}</span>{size ? ` · ${size}` : ''}</p>
+              <h1 className="mt-2 font-serif text-[34px] leading-tight text-ink">Veja na sua mesa pelo celular</h1>
+              <p className="mt-3 text-[16px] leading-relaxed text-ink-2">A câmera do celular coloca o item sobre a sua mesa, em tamanho real. Aponte a câmera do seu celular para o código.</p>
               {qr && <div className="mt-6 size-40 rounded-2xl bg-white p-3 shadow-[var(--shadow-card)]" role="img" aria-label="QR code para abrir esta página no celular" dangerouslySetInnerHTML={{ __html: qr }} />}
               <p className="mt-4 text-[14px] text-ink-3">Aqui você pode girar e aproximar o prato em 3D.</p>
             </div>
@@ -140,7 +141,7 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
           <div className="mx-auto max-w-md">
             {phase === 'error' ? (
               <>
-                <p className="flex items-center gap-2 text-[17px] font-semibold"><TriangleAlert size={20} className="text-clay" /> Não deu para abrir a câmera</p>
+                <p className="flex items-center gap-2 text-[17px] font-semibold"><TriangleAlert size={20} className="text-danger" /> Não deu para abrir a câmera</p>
                 <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{error}</p>
                 <Button size="lg" className="mt-5 w-full" icon={<Camera size={18} />} onClick={start}>Tentar de novo</Button>
               </>

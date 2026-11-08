@@ -83,7 +83,7 @@ h1, h2, .serif, .font-serif {
   backdrop-filter: blur(20px) saturate(180%);
 }
 
-/* Every press settles like a tile pushed into its bed. */
+/* Instant press feedback. */
 .press { transition: transform 160ms var(--ease-out-expo), background-color 160ms, color 160ms, border-color 160ms, box-shadow 160ms; }
 .press:active { transform: scale(0.97); }
 

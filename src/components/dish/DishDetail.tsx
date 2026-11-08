@@ -91,7 +91,7 @@ export function DishDetail({ dish, category }: { dish: Dish; category?: Category
             <h2 id="alergenos" className="font-sans text-[17px] font-semibold tracking-normal">Alérgenos</h2>
             {dish.allergens.length ? (
               <p className="mt-1.5 flex items-start gap-2 text-[15px] leading-relaxed text-ink-2">
-                <TriangleAlert size={17} className="mt-[3px] shrink-0 text-clay" aria-hidden />
+                <TriangleAlert size={17} className="mt-[3px] shrink-0 text-ink" aria-hidden />
                 Contém {dish.allergens.join(', ').toLowerCase()}.
               </p>
             ) : (

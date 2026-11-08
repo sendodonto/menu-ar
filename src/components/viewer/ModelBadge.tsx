@@ -16,7 +16,7 @@ export function RealSize({ model, className = '' }: { model: DishModel; classNam
   if (!model.dimensions) return null;
   return (
     <span className={`tnum inline-flex items-center gap-1.5 rounded-full bg-glaze-2 px-3 py-1 text-[13px] font-medium text-ink ${className}`}>
-      <Ruler size={14} className="text-clay" aria-hidden />
+      <Ruler size={14} className="text-ink-2" aria-hidden />
       Tamanho real · {formatDimensions(model.dimensions)}
     </span>
   );

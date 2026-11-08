@@ -1,272 +1,281 @@
 ---
 name: Casa Nostra · MENU AR
-description: A restaurant menu laid as a floor of tin-glazed majolica tiles, with dishes in 3D and on the guest's table.
+description: A calm, food-first restaurant menu that reads like a native Apple app, with dishes in 3D and on the guest's own table.
 colors:
-  glaze: "#f8f7f4"
-  glaze-2: "#f1ede6"
-  tile: "#fdfcfa"
-  grout: "#e4ded3"
-  grout-2: "#d3cbbd"
   clay: "#b4532f"
   clay-ink: "#8e3d1f"
-  clay-soft: "#f3e3da"
+  clay-soft: "#f6e8e1"
   ramina: "#5e6b2e"
-  ramina-soft: "#e8ead9"
-  ink: "#2a2420"
-  ink-2: "#5b524b"
-  ink-3: "#6f665e"
+  ramina-soft: "#ecefdf"
+  glaze: "#f8f7f4"
+  glaze-2: "#efece6"
+  tile: "#ffffff"
+  grout: "#e7e2da"
+  grout-2: "#d6cfc4"
+  ink: "#1c1a17"
+  ink-2: "#5a534c"
+  ink-3: "#6f675f"
   danger: "#a3271b"
 typography:
   display:
     fontFamily: "Bodoni Moda, 'Bodoni 72', Didot, serif"
-    fontSize: "34px / 3rem at sm+"
+    fontSize: "40px (60px at sm+)"
     fontWeight: 400
     lineHeight: 1.02
-    letterSpacing: "-0.01em"
+    letterSpacing: "-0.015em"
   headline:
     fontFamily: "Bodoni Moda, 'Bodoni 72', Didot, serif"
-    fontSize: "30px / 2.25rem at sm+"
+    fontSize: "36px (48px at sm+)"
     fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "-0.01em"
+    lineHeight: 1.05
+    letterSpacing: "-0.015em"
   title:
     fontFamily: "Bodoni Moda, 'Bodoni 72', Didot, serif"
-    fontSize: "18px"
+    fontSize: "26px (30px at sm+)"
     fontWeight: 400
-    lineHeight: 1.15
-    letterSpacing: "-0.01em"
+    lineHeight: 1
+    letterSpacing: "-0.015em"
+  subhead:
+    fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "17px"
+    fontWeight: 600
+    lineHeight: 1.3
   body:
     fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 400
-    lineHeight: 1.625
+    lineHeight: 1.375
     fontFeature: "'ss01'"
+  item:
+    fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "16px"
+    fontWeight: 600
+    lineHeight: 1.375
   label:
     fontFamily: "Schibsted Grotesk, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "13px"
+    fontSize: "12px"
     fontWeight: 500
-    lineHeight: 1.35
-    fontFeature: "'ss01', 'lnum'"
+    lineHeight: 1.3
 rounded:
-  tile: "3px"
-  chip: "2px"
+  tile: "12px"
+  group: "16px"
+  sheet: "28px"
+  full: "9999px"
 spacing:
-  grout: "1px"
-  tile-pad: "12px"
-  tile-pad-sm: "16px"
   gutter: "16px"
   gutter-sm: "24px"
-  section: "40px"
-  section-sm: "56px"
+  row: "16px"
+  section: "36px"
+  section-sm: "48px"
 components:
   button-primary:
     backgroundColor: "{colors.clay}"
-    textColor: "{colors.glaze}"
+    textColor: "{colors.tile}"
     rounded: "{rounded.tile}"
-    padding: "0 16px"
-    height: "44px"
+    height: "52px"
+    padding: "0 20px"
   button-primary-hover:
     backgroundColor: "{colors.clay-ink}"
   button-secondary:
     backgroundColor: "{colors.tile}"
     textColor: "{colors.ink}"
     rounded: "{rounded.tile}"
-    padding: "0 16px"
     height: "44px"
-  button-secondary-hover:
-    backgroundColor: "{colors.glaze-2}"
+    padding: "0 16px"
   button-ghost:
     textColor: "{colors.ink}"
     rounded: "{rounded.tile}"
-    padding: "0 16px"
     height: "44px"
-  button-danger:
+    padding: "0 16px"
+  button-icon:
     backgroundColor: "{colors.tile}"
-    textColor: "{colors.danger}"
-    rounded: "{rounded.tile}"
-    padding: "0 16px"
-    height: "44px"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.full}"
+    size: "40px"
   input:
     backgroundColor: "{colors.tile}"
     textColor: "{colors.ink}"
     rounded: "{rounded.tile}"
     padding: "10px 14px"
-  chip-category:
+  grouped-list:
     backgroundColor: "{colors.tile}"
-    textColor: "{colors.ink}"
     rounded: "{rounded.tile}"
-    padding: "0 14px"
-    height: "40px"
-  chip-category-active:
-    backgroundColor: "{colors.clay}"
-    textColor: "{colors.glaze}"
-  price-chip:
-    backgroundColor: "{colors.clay-soft}"
-    textColor: "{colors.clay-ink}"
-    rounded: "{rounded.chip}"
-    padding: "2px 6px"
-  dish-tile:
-    backgroundColor: "{colors.tile}"
-    textColor: "{colors.ink}"
-    padding: "12px"
-  cart-bar:
+    padding: "16px"
+  order-bar:
     backgroundColor: "{colors.ink}"
-    textColor: "{colors.glaze}"
-    rounded: "{rounded.tile}"
-    padding: "0 16px"
+    textColor: "{colors.tile}"
+    rounded: "{rounded.group}"
     height: "56px"
+    padding: "0 16px"
+  badge-3d:
+    backgroundColor: "{colors.tile}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.full}"
+    padding: "3px 8px"
+  badge-count:
+    backgroundColor: "{colors.clay}"
+    textColor: "{colors.tile}"
+    rounded: "{rounded.full}"
+    height: "18px"
 ---
 
 # Design System: Casa Nostra · MENU AR
 
 ## Overview
 
-**Creative North Star: "The Maiolica Floor"**
+**Creative North Star: "The Quiet Native App"**
 
-The menu is a floor of tin-glazed majolica tiles. Every dish is a square tile set into a fine grout grid on a glaze-white ground; the clay body shows at the tile's bottom edge, in price chips and in the active state; ramina green marks things that are done or available; text is soft manganese ink. The grid is the real CSS armature, not decoration: tiles butt against each other with a 1px grout gap, so the page reads as one laid surface rather than cards floating over a page.
+The menu behaves like a first-party iOS app that happens to belong to a restaurant: one clear scrolling list, photographs leading, one primary action per screen. A warm off-white ground carries white grouped surfaces with soft shadow and hairline dividers; translucent blurred chrome (header, category tabs, bottom action bar) lets content scroll beneath it. Bodoni Moda gives page and section titles a restaurant's voice; everything functional is Schibsted Grotesk.
 
-Density is Operate: the guest goes menu, dish, 3D, table, order on their own phone; the owner runs orders and the menu on desktop in the same world, with the same tiles, grout and clay, only tighter. Shapes are fired tile (3px corners), never pills. Motion has one grammar: a tile settling into its bed (short rise plus slight scale, out-expo easing, about 360ms, staggered 45ms per tile).
+Density is relaxed but not sparse: 16px gutters, 16px row padding, generous section breaks. Color is almost absent; ink on off-white does the work, terracotta is a rare signal, olive confirms. The camera view is the one dark place: dark glass controls float over the live camera feed so the dish on the guest's table stays the subject.
 
-The only hand-painted element is the restaurant mark: one majolica tile (clay border, four ramina leaves, terracotta flower). It is the brand, used wherever the brand is named (header, footer, admin sidebar), never as an ornament elsewhere.
+Confirmed rejections: the previous "Maiolica" tile-floor world (rejected by the user as ugly and confusing), busy grids of icon buttons, decorative tile ornament, emoji, gradients, over-rounded cards.
 
 **Key Characteristics:**
-- Glaze-white ground, white tile faces, 1px warm grout hairlines forming a visible grid.
-- Terracotta clay as the single action and price color; ramina green only for confirmations and availability.
-- Bodoni Moda serif for names and headings, Schibsted Grotesk for everything functional.
-- 3px corners everywhere a surface has corners; full rounding only for tiny indicators.
-- Flat at rest; soft warm shadows only on things that float above the floor (cart bar, toasts, dialogs, AR overlay controls).
-- Lining figures on every price, minute count and real-size dimension.
+- Off-white ground, white grouped lists, hairline dividers, soft ambient shadows.
+- Translucent blurred chrome over scrolling content.
+- Serif for titles only; grotesk for every control, price and label.
+- Terracotta is scarce and semantic; olive means "done".
+- Dark glass only over the camera feed.
 
 ## Colors
 
-A warm, low-chroma ceramic palette: off-white glazes, warm grout greys, one fired terracotta and one olive green, with soft-black ink.
+A near-neutral warm palette where ink carries hierarchy and one terracotta accent marks the action.
 
 ### Primary
-- **Fired Terracotta** (clay): primary buttons, active category chip, cart count badge, focus ring, caret, accent-color, icon tint on 3D and real-size markers, and the 2px inset bottom edge of every dish tile.
-- **Deep Clay Ink** (clay-ink): text-weight terracotta. Prices, primary hover, link hover on dish names, selection text.
-- **Clay Wash** (clay-soft): the price chip ground, text selection, the active admin nav item.
+- **Terracotta Clay** (clay): fill of the primary CTA (Adicionar, Enviar pedido), the active category tab underline, the cart count badge, and the global focus ring, caret and accent-color.
+- **Burnt Clay Ink** (clay-ink): primary hover, text-link actions such as "Cancelar" in search, and selection text.
+- **Clay Blush** (clay-soft): text selection background; admin active nav row.
 
 ### Secondary
-- **Ramina Olive** (ramina): confirmation and availability only: order-sent check tile, "Entregue" status, switch on-state.
-- **Ramina Wash** (ramina-soft): soft ground for availability states.
+- **Ramina Olive** (ramina): confirmations only: the order-sent check disc, admin "Entregue" status, admin switches on.
+- **Olive Mist** (ramina-soft): soft olive surface for confirmation contexts.
 
 ### Neutral
-- **Glaze White** (glaze): page ground, sticky header and rail, sheets and dialog surfaces. Pinned by the brief.
-- **Second Glaze** (glaze-2): hover fill for secondary and ghost controls, skeleton base, footer band, 3D stage falloff.
-- **Tile Face** (tile): the face of every tile, input, chip and secondary button; one step brighter than the ground.
-- **Grout** (grout): every 1px hairline: grid gaps, borders, dividers.
-- **Dark Grout** (grout-2): hover border, scrollbar thumb, switch off-state.
-- **Manganese Ink** (ink): body and heading text; the cart bar and toast ground.
-- **Ink 2 / Ink 3** (ink-2, ink-3): descriptions, then meta (minutes, counts, hints, placeholders). Under `prefers-contrast: more` both darken and grout deepens.
-- **Kiln Red** (danger): destructive buttons, field errors, cancelled status. Never decorative.
+- **Warm Off-White** (glaze): page ground, the material chrome tint, theme-color.
+- **Linen** (glaze-2): secondary fills: icon discs, the 3D stage, skeletons, ghost hover.
+- **Plate White** (tile): grouped lists, cards, secondary buttons, inputs, round add buttons.
+- **Hairline** (grout): dividers inside grouped lists and input borders.
+- **Hairline Strong** (grout-2): input hover border, scrollbar thumb.
+- **Soft Black** (ink): text, the floating order bar, toasts, the AR icon disc.
+- **Graphite** (ink-2): descriptions and secondary text.
+- **Stone** (ink-3): hints, placeholders, chevrons, photo credits.
+- **Brick Red** (danger): errors and destructive actions only.
 
 ### Named Rules
-**The One Clay Rule.** Terracotta is the only action color. If something is clickable and primary, it is clay; if something is clay, it is either an action, a price, the active state, or a tile's fired edge.
+**The One Terracotta Rule.** Terracotta appears only on the primary CTA, the active tab line, the cart count badge and the focus ring. If a second terracotta element shows on the same screen and it is not one of those, it is wrong.
 
-**The Ramina Means Done Rule.** Green appears only when something succeeded or is available. Never as a second accent for decoration.
-
-**The Ground and Face Rule.** Ground is glaze, surfaces are tile, separations are grout. Do not introduce a fourth neutral surface.
+**The Olive Means Done Rule.** Olive is never decoration; it marks a completed state.
 
 ## Typography
 
-**Display Font:** Bodoni Moda (optical sizing on, fallbacks Bodoni 72, Didot, serif)
-**Body Font:** Schibsted Grotesk (with ui-sans-serif, system-ui), stylistic set `ss01`
+**Display Font:** Bodoni Moda (with 'Bodoni 72', Didot, serif), optical sizing on
+**Body Font:** Schibsted Grotesk (with ui-sans-serif, system-ui), stylistic set ss01 on
 
-**Character:** A high-contrast Didone gives the dish names the voice of a printed Italian menu; a sturdy grotesk keeps prices, buttons and admin tables plain and legible.
+**Character:** A high-contrast Didone gives the restaurant its voice at title sizes; a sturdy contemporary grotesk keeps every control, price and list item legible like system UI.
 
 ### Hierarchy
-- **Display** (400, 34px mobile / 3rem desktop, 1.02): the house dish name in the first viewport; admin page titles.
-- **Headline** (400, 30px / 2.25rem, 1): category section headings, admin board column and section headings at smaller sizes.
-- **Title** (400, 18px, 1.15): dish names on tiles.
-- **Body** (400, 15px, 1.625): descriptions, inputs, button labels; descriptions held to about 48ch.
-- **Label** (500, 13px): meta (minutes, counts, hints, real-size chip). Badge text drops to 11px semibold. Prices are 14px semibold in the chip, 20px semibold in the feature.
-
-All serif headings get `text-wrap: balance` and -0.01em tracking.
+- **Display** (400, 40px / 60px at sm+, 1.02): the page title ("Cardápio").
+- **Headline** (400, 36px / 48px at sm+, 1.05): the dish name on its own page; 34px in the desktop AR handoff.
+- **Title** (400, 26px / 30px at sm+, 1): section titles ("Destaques do chef", category names), dialog titles.
+- **Subhead** (sans 600, 17px): in-page headings on detail and cart screens (Ingredientes, Alérgenos, Resumo).
+- **Item** (sans 600, 16px): dish names in lists and cards, button labels at lg.
+- **Body** (400, 15px, 1.375): descriptions (14px, two-line clamp in rows), prices (15px medium, lining numerals), long text at 16px relaxed capped near 58ch.
+- **Label** (500, 11–12px): fact labels, the 3D badge, camera control captions. Sentence case, no tracking.
 
 ### Named Rules
-**The Serif Names Things Rule.** Serif is for names: the restaurant, dishes, categories, page titles. Prices, buttons, labels and data are always sans.
+**The Serif Stops at Titles Rule.** Bodoni sets page, section and dish-page titles only. Any heading inside a functional block switches to the sans at 17px semibold.
 
-**The Lining Figures Rule.** Every number a guest compares (price, minutes, Ø cm, counts) uses lining numerals.
+**The Lining Price Rule.** Every price and count uses lining numerals (`.tnum`).
 
 ## Layout
 
-A single centered column capped at 72rem (max-w-6xl) with 16px gutters on mobile, 24px from `sm` (640px). The sticky header is 64px plus safe-area inset; the sticky category rail beneath it is 56px; scroll padding is 8.5rem so anchored sections clear both.
+Single centered column, max 768px (48rem) for the menu, 1024px (64rem) for dish detail, which splits into two columns at sm+ with the photo sticky on the left. Gutters 16px, 24px at sm+. Sections are spaced 36px apart (48px at sm+); titles sit 12px above their group.
 
-The dish grid is a true CSS grid with a 1px gap whose background is grout: 2 columns on mobile (edge to edge, no gutter), 3 at `md` (768px), 4 at `lg` (1024px). From `sm` the grid is inset by the gutter and clipped to a 3px tile corner. Tile interiors pad 12px, 16px from `sm`. Sections are separated by 40px (56px from `sm`) with a serif heading left and a lining-figure count right.
+The first viewport stacks: translucent header (56px), page title and restaurant line, a one-line 3D explainer, the chef-highlights carousel (72% width, 4:5 cards, snap scrolling, edge-aligned to the column), then sticky translucent category tabs (48px) pinned under the header with scroll-spy.
 
-The first viewport is one wide tile: photo then text stacked on mobile; at `sm` a two-column split (1.15fr photo, 1fr text, min 420px tall) inside a single grout-bordered tile. Fixed bottom bars (cart bar, dish action bar) respect the bottom safe area with a 12px minimum.
-
-Admin uses a left sidebar (glaze, grout right border) and the same tile/grout vocabulary for boards and tables.
+Bottom-anchored actions respect the safe area (`max(env(safe-area-inset-bottom), 12–14px)`); content reserves room under them. Every tap target is at least 40px, most 44px.
 
 ## Elevation & Depth
 
-Flat by default: depth is conveyed by the glaze/tile/grout layering and hairlines. Shadows are soft, warm (tinted from ink, never pure black), and reserved for things that float above the floor.
+Hybrid: tonal layering (white on off-white) plus soft, ambient shadows, plus translucent material for chrome. Shadows are never hard or offset.
 
 ### Shadow Vocabulary
-- **Lift** (`box-shadow: 0 1px 2px rgb(42 36 32 / 0.06), 0 10px 28px -14px rgb(42 36 32 / 0.28)`): the cart bar, toasts, the 3D dialog on desktop, overlay buttons on photos and in AR, featured-strip hover.
-- **Sheet** (`box-shadow: 0 -1px 0 rgb(42 36 32 / 0.06), 0 -18px 40px -24px rgb(42 36 32 / 0.35)`): bottom-anchored action bars (dish detail, AR controls).
-- **Grout ring + fired edge** (`box-shadow: 0 0 0 1px var(--color-grout), inset 0 -2px 0 var(--color-clay)`): the dish tile; not elevation, it draws the grout around the tile and the clay body at its foot.
-- **Backdrop** (`rgb(42 36 32 / 0.45)`, 2px blur): behind open dialogs.
+- **Card** (`0 1px 2px rgb(28 26 23 / 0.04), 0 2px 10px -4px rgb(28 26 23 / 0.08)`): grouped lists, fact strips, the quantity stepper, summary cards.
+- **Lift** (`0 1px 2px rgb(28 26 23 / 0.05), 0 8px 24px -12px rgb(28 26 23 / 0.22)`): floating controls: the round add button, the order bar, toasts, desktop dialogs.
+- **Sheet** (`0 -1px 0 rgb(28 26 23 / 0.05), 0 -16px 40px -24px rgb(28 26 23 / 0.35)`): upward shadow for bottom sheets.
+
+### Materials
+- **Light material**: off-white at 78% with 20px blur and 180% saturation, separated from content by a 6% black hairline. Header, category tabs, dish bottom bar, photo back button.
+- **Dark glass**: black at 45% with extra-large blur and 150% saturation, white text. Used only over the live camera feed. Under reduced transparency it falls back to opaque ink at 92%; light material falls back to solid off-white.
 
 ### Named Rules
-**The Floor Stays Flat Rule.** Nothing laid in the grid casts a shadow at rest. Only floating layers (bars, toasts, dialogs, overlay controls) get Lift or Sheet.
+**The Chrome Is Glass Rule.** Persistent chrome is translucent and content scrolls under it; content surfaces are opaque.
+
+**The Dark Only Over Camera Rule.** Dark glass exists because the camera feed is unpredictable; it never appears on light screens.
 
 ## Shapes
 
-Fired-tile corners (3px) on every surface: buttons, inputs, chips, tiles, the house feature, dialogs, the cart bar. Price chips use a slightly tighter 2px. Full rounding is limited to tiny indicators: the cart count bubble, the admin switch track and knob, and progress bars. Borders are always 1px grout (darkening to grout-2 on hover). Dish imagery is cropped square on tiles and 16:11 in the mobile feature.
+Gently curved, never pillowy. Images, list groups, inputs and standard buttons use 12px; larger grouped cards on detail and cart, the order bar and camera controls use 16px; the 3D dialog and desktop model stage use 28px as a sheet. Every icon-only control, stepper, badge, toast and search field is fully round. Dividers are 1px hairlines inset inside groups; groups clip their rows.
 
 ## Components
 
 ### Buttons
-Tactile and pressed-in: every press settles like a tile pushed into its bed (scale 0.97, 160ms out-expo).
-- **Shape:** fired-tile corners (3px). Heights 36 / 44 / 48px (sm / md / lg), 500 weight, 14 / 15 / 16px.
-- **Primary:** clay on glaze text with a faint inset bottom shade; hover deepens to clay-ink.
-- **Secondary:** tile face, ink text, 1px grout border; hover darkens border to grout-2 and fills glaze-2.
-- **Ghost:** ink text, no border; hover fills glaze-2.
-- **Danger:** tile face, kiln-red text, grout border; hover tints the border red at 40%.
-- **Focus:** 2px clay outline, 2px offset (global). Disabled at 45% opacity.
+Quiet and system-like; the press is the feedback.
+- **Shape:** gently curved (12px); icon buttons fully round.
+- **Primary:** terracotta fill, white label, 52px tall at lg with 16px semibold label; 44px at md. One per screen.
+- **Hover / Focus / Press:** hover deepens to clay-ink; every pressable scales to 0.97 on press over 160ms with an expo-out curve; focus shows a 2px terracotta outline offset 2px.
+- **Secondary:** white with a hairline border, ink label, hover to off-white.
+- **Ghost:** no fill, ink label, hover to linen.
+- **Danger:** white with hairline border, brick-red label.
+- **Round add:** 40px white disc with Lift shadow, plus icon, pinned to the bottom-right of a dish row's photo.
 
 ### Chips
-- **Category chip:** 40px tall, tile face, grout border, 14px medium; active is solid clay with glaze text. Lives in the sticky rail with a square search chip that expands into a full-width search field.
-- **Price chip:** clay-soft ground, clay-ink 14px semibold lining figures, 2px corners.
-- **Real-size chip:** tile face, grout border, ruler icon in clay, "Tamanho real · Ø 34 cm".
-- **3D badge:** small tile-face tab over the photo's top-left, cube icon in clay, 11px semibold.
+- **3D badge:** small white pill (11px semibold) with a cube icon; on list rows it sits flat on linen without shadow.
 
 ### Cards / Containers
-- **Dish tile:** tile face, square photo, serif title, price chip plus minutes, then actions (3D, AR, add). Grout ring plus a 2px clay foot. Enters with tile-set stagger.
-- **House feature:** one large tile; photo plus serif display name, description, price, real-size chip and the two actions "Ver em 3D" (secondary) and "Na minha mesa" (primary).
-- **Admin order card:** tile face, grout border, 3px corners, grout divider between header and lines; empty columns show a dashed grout cell.
+- **Corner Style:** 12px for list groups, 16px for detail and cart groups.
+- **Background:** plate white on the off-white ground.
+- **Shadow Strategy:** Card shadow at rest; Lift only for floating elements.
+- **Border:** none outside; hairline dividers between rows.
+- **Internal Padding:** 16px (20px at sm+).
 
 ### Inputs / Fields
-- **Style:** tile face, 1px grout border, 3px corners, 10px 14px padding, 15px text, ink-3 placeholder; hover border grout-2.
-- **Focus:** border turns clay with a 2px clay ring at 20%.
-- **Error:** border and message in kiln red; label 14px medium above, hint 14px ink-3 below.
+- **Style:** white, 1px hairline border, 12px radius, 16px text, label above at 14px medium.
+- **Focus:** border turns terracotta with a 2px terracotta ring at 20% opacity.
+- **Error:** brick-red border and message below; hints in stone.
+- **Search:** fully round linen-tinted field (5% black) inside the tab bar, expands in place with a "Cancelar" text action.
 
 ### Navigation
-- **Guest header:** sticky glaze bar, grout bottom border, mark left, 44px cart tile right with a clay count bubble that bumps on change.
-- **Category rail:** sticky under the header, horizontally scrolling chips with scroll-spy that centers the active chip.
-- **Admin sidebar:** mark at top, icon plus label items; active item is clay-soft ground with clay-ink text.
+- **Header:** light material, wordmark left, bag icon right with a terracotta count badge that bumps on change.
+- **Category tabs:** light material, 15px labels; inactive graphite, active ink semibold with a 2px terracotta underline; the rail fades at its right edge and auto-centers the active tab.
 
-### Cart Bar (signature)
-A fixed bottom bar in manganese ink with Lift: clay count tile, "Ver pedido", total in lining figures, arrow. Appears with tile-set once the order has an item.
+### Dish Row (signature)
+Text left (name, two-line description, price, optional 3D badge), 104px square photo right, the whole row opens the dish; a separate round add button floats on the photo corner.
 
-### 3D Viewer
-A full-screen sheet on mobile, a 3px-cornered Lift dialog on desktop; enters and leaves along the same path (24px rise, 360ms out-expo). Model controls appear only for dishes that have a model.
+### Order Bar
+Floating soft-black bar (56px, 16px radius, Lift shadow) once the order has items: count pill, "Ver pedido", total.
+
+### Camera View (signature)
+Full-bleed camera feed with dark glass panels: dish name and price top-left, round close top-right, status pill, and a bottom row of two 56px glass tool buttons (Trazer, Ocultar) beside a solid white "Adicionar · price" button. On desktop the view becomes an off-white handoff with the 3D stage and a QR code.
+
+### Toast
+Fully round soft-black pill with Lift shadow, olive-tinted check or clay-tinted alert icon, above the order bar.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** lay dishes in a CSS grid with a 1px grout gap; tiles touch, the grout shows.
-- **Do** use 3px corners on every surface with corners.
-- **Do** keep terracotta for actions, prices, the active state and the tile's fired edge.
-- **Do** use lining figures for prices, minutes and dimensions.
-- **Do** animate entries with the settle grammar (rise plus slight scale, out-expo, about 360ms, 45ms stagger) and honor reduced motion.
-- **Do** show 3D and AR controls only where a model exists, and label demo models as demonstrative.
+- **Do** keep one terracotta primary action per screen, plus only the active tab line, cart count badge and focus ring.
+- **Do** put dishes in white grouped lists with hairline dividers and the Card shadow.
+- **Do** make persistent chrome light material (78% off-white, 20px blur) with a hairline edge.
+- **Do** set titles in Bodoni Moda and every functional label, price and heading-in-a-block in Schibsted Grotesk.
+- **Do** give every pressable the 0.97 press scale and a 40–44px minimum target.
+- **Do** use dark glass only over the camera feed, with an opaque fallback under reduced transparency.
 
 ### Don't:
-- **Don't** float rounded cards over the page or round surfaces into pills.
-- **Don't** shadow anything laid in the grid; Lift and Sheet are for floating layers only.
-- **Don't** use ramina green as decoration; it means done or available.
-- **Don't** use emoji or decorative gradients on surfaces.
-- **Don't** repeat the hand-painted tile motif as ornament; it is the restaurant mark only.
-- **Don't** set prices, buttons or data in the serif.
+- **Don't** bring back majolica tiles, tile borders or painted ornament.
+- **Don't** build grids of icon buttons; one list, one action.
+- **Don't** use emoji, gradients or hard offset shadows.
+- **Don't** round cards beyond 16px; 28px is for sheets only.
+- **Don't** use terracotta for icons, decoration or any badge other than the cart count.
+- **Don't** use olive except to confirm a completed state.
