@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "npx serve out",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types src/lib/*.test.ts"
+    "test": "node --test --experimental-strip-types src/lib/*.test.ts src/lib/ar/*.test.ts"
   },
   "dependencies": {
     "@google/model-viewer": "^4.4.0",

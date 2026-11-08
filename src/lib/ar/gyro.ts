@@ -1,12 +1,11 @@
 import * as THREE from 'three';
+import { createOrientationFilter } from './orientation-filter';
 import { coverVideo, createStage, loadDish } from './stage';
 
 // shortcut: typical phone main-camera field of view along the long side; real devices vary ±10%, so scale is approximate.
 const LONG_SIDE_FOV_DEG = 66;
 // shortcut: assumed height of the phone above the table when seated; the dish's real size depends on it.
 const TABLE_DROP_M = 0.4;
-// Fraction of the remaining rotation applied per frame: filters sensor jitter without feeling laggy.
-const SMOOTHING = 0.35;
 
 type OrientationSensorLike = EventTarget & { quaternion?: number[]; start(): void; stop(): void };
 type SensorCtor = new (opts: { frequency: number; referenceFrame: 'screen' | 'device' }) => OrientationSensorLike;
@@ -25,7 +24,7 @@ const Z_UP_TO_Y_UP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1
  * Orientation source. Prefers the gyroscope-only RelativeOrientationSensor (Chrome Android: no compass, so no yaw
  * jumps) and falls back to deviceorientation (Safari). Writes the latest camera rotation into `target`.
  */
-function watchOrientation(target: THREE.Quaternion, onFirst: () => void) {
+function watchOrientation(target: THREE.Quaternion, onFirst: () => void, onNoGyro: () => void) {
   let first = true;
   const got = () => { if (first) { first = false; onFirst(); } };
   const Ctor = (window as unknown as { RelativeOrientationSensor?: SensorCtor }).RelativeOrientationSensor;
@@ -42,12 +41,13 @@ function watchOrientation(target: THREE.Quaternion, onFirst: () => void) {
       sensor.addEventListener('error', () => { sensor.stop(); fallback(); });
       sensor.start();
       let stopFallback = () => {};
-      function fallback() { stopFallback = watchDeviceOrientation(target, got); }
+      function fallback() { onNoGyro(); stopFallback = watchDeviceOrientation(target, got); }
       return () => { sensor.stop(); stopFallback(); };
     } catch {
       // Blocked by permissions policy or unsupported options: use deviceorientation instead.
     }
   }
+  if (!Ctor) onNoGyro();
   return watchDeviceOrientation(target, got);
 }
 
@@ -105,13 +105,16 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
   };
 
   const target = new THREE.Quaternion();
+  const filter = createOrientationFilter();
   let ready = false;
   let placed = false;
-  const stopOrientation = watchOrientation(target, () => {
-    camera.quaternion.copy(target);
-    ready = true;
-    events.onSensor(true);
-  });
+  const stopOrientation = watchOrientation(
+    target,
+    () => { camera.quaternion.copy(target); ready = true; events.onSensor(true); },
+    // shortcut: without the gyro-only sensor the browser may derive orientation from accelerometer + compass, which
+    // shakes; filter harder there. Upgrade path: a real AR runtime (ARCore/ARKit) where the device has one.
+    () => filter.tune({ minCutoff: 0.35, beta: 1.2, deadZoneDeg: 0.45 }),
+  );
   const noSensor = setTimeout(() => { if (!ready) events.onSensor(false); }, 2500);
 
   // Just above screen centre, so the whole dish lands clear of the bottom controls.
@@ -142,9 +145,12 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
 
-  renderer.setAnimationLoop(() => {
+  let last = performance.now();
+  renderer.setAnimationLoop((now: number) => {
+    const dt = (now - last) / 1000;
+    last = now;
     if (ready) {
-      camera.quaternion.slerp(target, SMOOTHING);
+      filter.step(camera.quaternion, target, dt);
       if (!placed) aim(); // appear as soon as the phone points at the table
     }
     renderer.render(scene, camera);
