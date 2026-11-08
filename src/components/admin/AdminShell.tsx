@@ -12,7 +12,7 @@ const NAV = [
   { href: '/admin/pedidos/', label: 'Pedidos', icon: ReceiptText },
   { href: '/admin/pratos/', label: 'Pratos', icon: UtensilsCrossed },
   { href: '/admin/categorias/', label: 'Categorias', icon: Tags },
-  { href: '/admin/cartoes/', label: 'Cartões das mesas', icon: QrCode },
+  { href: '/admin/cartoes/', label: 'QR das mesas', icon: QrCode },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

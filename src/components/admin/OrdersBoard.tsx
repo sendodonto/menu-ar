@@ -112,7 +112,7 @@ function OrderCard({ order, fresh, onSeen, onMove }: { order: Order; fresh: bool
           <p className="tnum text-[15px] font-semibold">{order.code} <span className="font-normal text-ink-2">· Mesa {order.table}</span></p>
           <p className="tnum text-[13px] text-ink-3">{formatTime(order.createdAt)} · há {age} min{order.customerName ? ` · ${order.customerName}` : ''}</p>
         </div>
-        {fresh && <span className="rounded-tile bg-clay px-2 py-0.5 text-[12px] font-semibold text-glaze">Novo</span>}
+        {fresh && <span className="rounded-tile bg-clay px-2 py-0.5 text-[12px] font-semibold text-white">Novo</span>}
         {!fresh && order.status !== 'pronto' && age >= 25 && <span className="rounded-tile bg-clay-soft px-2 py-0.5 text-[12px] font-semibold text-clay-ink">Atrasado</span>}
       </div>
       <ul className="tnum mt-2.5 grid gap-1 border-t border-grout pt-2.5 text-[14px]">

@@ -8,7 +8,6 @@ import type { ModelViewerElement } from '@/types/model-viewer';
 type Props = {
   src: string;
   alt: string;
-  ar?: boolean;
   autoRotate?: boolean;
   className?: string;
   children?: ReactNode;
@@ -17,7 +16,7 @@ type Props = {
 
 /** <model-viewer> with a real progress readout and an error state. Children are passed as model-viewer slots. */
 export const ModelStage = forwardRef<ModelViewerElement | null, Props>(function ModelStage(
-  { src, alt, ar = false, autoRotate = true, className = '', children, onLoad },
+  { src, alt, autoRotate = true, className = '', children, onLoad },
   ref,
 ) {
   const url = useAssetUrl(src);
@@ -53,10 +52,6 @@ export const ModelStage = forwardRef<ModelViewerElement | null, Props>(function 
           ref={el as never}
           src={url}
           alt={alt}
-          ar={ar || undefined}
-          ar-modes="webxr quick-look"
-          ar-scale="fixed"
-          ar-placement="floor"
           camera-controls
           touch-action="pan-y"
           auto-rotate={autoRotate || undefined}

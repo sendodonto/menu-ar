@@ -5,7 +5,7 @@ import { TableCards } from '@/components/admin/TableCards';
 export default function Page() {
   return (
     <>
-      <div className="print:hidden"><AdminHeading title="Cartões das mesas" /></div>
+      <div className="print:hidden"><AdminHeading title="QR das mesas" /></div>
       <TableCards />
     </>
   );

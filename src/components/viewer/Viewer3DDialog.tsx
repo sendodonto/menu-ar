@@ -28,16 +28,16 @@ export function Viewer3DDialog() {
       className="sheet m-0 mt-auto h-[100dvh] max-h-none w-full max-w-none bg-transparent p-0 backdrop:backdrop-blur-[2px] sm:m-auto sm:h-[min(860px,92dvh)] sm:w-[min(1080px,94vw)]"
     >
       {dish?.model && (
-        <div className="flex h-full flex-col bg-glaze sm:rounded-tile sm:shadow-lift">
+        <div className="flex h-full flex-col bg-glaze sm:overflow-hidden sm:rounded-[28px] sm:shadow-lift">
           <header className="flex items-start justify-between gap-4 border-b border-grout px-4 pb-3 pt-[max(env(safe-area-inset-top),14px)] sm:px-6">
             <div>
-              <h2 id="viewer-title" className="text-[26px] leading-tight">{dish.name}</h2>
+              <h2 id="viewer-title" className="font-serif text-[26px] leading-tight">{dish.name}</h2>
               <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className="tnum text-[15px] font-medium text-clay-ink">{formatPrice(dish.price)}</span>
+                <span className="tnum text-[15px] font-medium text-ink">{formatPrice(dish.price)}</span>
                 <ModelKind model={dish.model} />
               </p>
             </div>
-            <button type="button" onClick={close} className="press -mr-1 grid size-11 shrink-0 place-items-center rounded-tile hover:bg-glaze-2" aria-label="Fechar visualização 3D">
+            <button type="button" onClick={close} className="press -mr-1 grid size-10 shrink-0 place-items-center rounded-full bg-glaze-2 hover:bg-grout" aria-label="Fechar visualização 3D">
               <X size={22} />
             </button>
           </header>

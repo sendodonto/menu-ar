@@ -17,7 +17,7 @@ npm run build      # gera o site estático em out/
 |---|---|
 | `/` | Cardápio (aceita `/?mesa=12` no QR code da mesa) |
 | `/prato/?id=…` | Detalhes do prato |
-| `/ar/?id=…` | Ver na minha mesa (AR) |
+| `/ar/?id=…` | Ver na minha mesa (câmera + giroscópio) |
 | `/pedido/` | Carrinho e envio do pedido |
 | `/admin/` | Login da área do restaurante |
 
@@ -35,20 +35,18 @@ Para usar Supabase de verdade:
 
 Pedidos de clientes entram pela função `create_order`, que lê os preços do banco. Ninguém anônimo lê pedidos.
 
-## Realidade aumentada
+## Ver na minha mesa
 
-Nenhum modo pede para instalar nada:
+`/ar/?id=…` abre a câmera traseira e usa o giroscópio do celular (estilo Pokémon GO), sem instalar nada e sem Google Play Services:
 
-- **Cartão da mesa** (padrão no Android e em qualquer celular): a câmera reconhece o cartão impresso da Casa Nostra (MindAR, no próprio navegador) e o prato fica preso sobre ele, no tamanho real, enquanto o cliente se move. Rota `/mesa/?id=…&modo=cartao`.
-- **Sem cartão** (aproximado): câmera + giroscópio. O prato fica no lugar quando o celular gira, mas não acompanha se o cliente andar. Rota `/mesa/?id=…&modo=giroscopio`.
-- **iPhone/iPad:** Quick Look, que já vem no iOS (USDZ gerado a partir do GLB). O cartão também funciona.
-- **AR do Google (WebXR):** aparece só como opção extra quando o Chrome diz que suporta, com o aviso de que pode pedir o Google Play Services para RA. O Scene Viewer foi removido porque sempre pedia essa instalação.
+- o prato aparece onde o celular aponta na mesa, em tamanho real aproximado (assume o celular ~40 cm acima da mesa);
+- arrastar com o dedo move o prato pela mesa; girar o celular mantém o prato no lugar;
+- no Chrome Android usa o `RelativeOrientationSensor` (só giroscópio, sem bússola, sem “pulos”), com suavização; no iPhone usa `deviceorientation` com a permissão de movimento;
+- no computador mostra um QR code para abrir no celular.
 
-**Cartões das mesas:** no admin, em *Cartões das mesas*, escolha as mesas e imprima em 100% (sem “ajustar à página”). A imagem precisa sair com **10 cm de largura**: a escala do prato é calculada a partir dela. O QR de cada cartão abre o cardápio já com a mesa (`/?mesa=N`).
+Limite: sem ARCore/ARKit o celular não “enxerga” a mesa, então o prato não acompanha se a pessoa andar em volta. Câmera exige **HTTPS**: teste pelo link do GitHub Pages.
 
-Trocar a arte do cartão: edite `tools/ar/make_card.py`, rode-o e depois `node tools/ar/compile-target.mjs` com um Edge/Chrome usando a GPU de verdade (sob SwiftShader o alvo não é reconhecido).
-
-Câmera exige **HTTPS**: teste pelo link do GitHub Pages.
+**QR das mesas:** no admin, gere e imprima o QR de cada mesa; ele abre o cardápio já com o número da mesa (`/?mesa=N`).
 
 ## Modelos 3D
 

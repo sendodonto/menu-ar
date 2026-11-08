@@ -13,7 +13,6 @@
     "@google/model-viewer": "^4.4.0",
     "@supabase/supabase-js": "^2.119.0",
     "lucide-react": "^1.70.0",
-    "mind-ar": "^1.2.5",
     "next": "^16.4.5",
     "qrcode": "^1.5.4",
     "react": "^19.3.1",

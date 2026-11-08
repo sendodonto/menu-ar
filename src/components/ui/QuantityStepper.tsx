@@ -2,9 +2,9 @@
 import { Minus, Plus } from 'lucide-react';
 
 export function QuantityStepper({ value, onChange, label }: { value: number; onChange: (n: number) => void; label: string }) {
-  const btn = 'press grid size-11 place-items-center text-ink hover:bg-glaze-2 disabled:opacity-35';
+  const btn = 'press grid size-11 place-items-center rounded-full text-ink hover:bg-glaze disabled:opacity-30';
   return (
-    <div role="group" aria-label={`Quantidade de ${label}`} className="inline-flex items-center rounded-tile border border-grout bg-tile">
+    <div role="group" aria-label={`Quantidade de ${label}`} className="inline-flex items-center rounded-full bg-tile shadow-[var(--shadow-card)]">
       <button type="button" className={btn} onClick={() => onChange(value - 1)} disabled={value <= 1} aria-label="Diminuir">
         <Minus size={16} />
       </button>

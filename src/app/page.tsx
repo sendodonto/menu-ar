@@ -3,7 +3,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { CartBar } from '@/components/menu/CartBar';
 import { CategoryRail } from '@/components/menu/CategoryRail';
 import { FeaturedStrip } from '@/components/menu/FeaturedStrip';
-import { HouseFeature } from '@/components/menu/HouseFeature';
+import { MenuIntro } from '@/components/menu/MenuIntro';
 import { MenuFooter } from '@/components/menu/MenuFooter';
 import { MenuSection } from '@/components/menu/MenuSection';
 import { MenuSkeleton } from '@/components/menu/MenuSkeleton';
@@ -27,7 +27,6 @@ export default function MenuPage() {
     if (mesa) setTable(mesa);
   }, [setTable]);
 
-  const house = useMemo(() => dishes.find((d) => d.featured && d.model) ?? dishes.find((d) => d.featured) ?? dishes[0], [dishes]);
   const matches = useMemo(
     () => (q ? dishes.filter((d) => fold([d.name, d.description, ...d.ingredients].join(' ')).includes(q)) : dishes),
     [dishes, q],
@@ -47,11 +46,9 @@ export default function MenuPage() {
           <EmptyState title="Cardápio em preparação" body="O restaurante ainda não publicou pratos. Volte em instantes." />
         ) : (
           <>
-            {house && <HouseFeature dish={house} />}
-            <div className="sm:mt-5">
-              <CategoryRail categories={categories.filter((c) => sections.some((s) => s.category.id === c.id))} query={query} onQuery={setQuery} />
-            </div>
-            {!q && <FeaturedStrip dishes={dishes.filter((d) => d.featured && d.id !== house?.id)} />}
+            <MenuIntro />
+            {!q && <FeaturedStrip dishes={dishes.filter((d) => d.featured)} />}
+            <CategoryRail categories={categories.filter((c) => sections.some((s) => s.category.id === c.id))} query={query} onQuery={setQuery} />
             {sections.length ? (
               sections.map((s) => <MenuSection key={s.category.id} {...s} />)
             ) : (

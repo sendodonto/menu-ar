@@ -15,7 +15,7 @@ export function ModelKind({ model }: { model: DishModel }) {
 export function RealSize({ model, className = '' }: { model: DishModel; className?: string }) {
   if (!model.dimensions) return null;
   return (
-    <span className={`tnum inline-flex items-center gap-1.5 rounded-tile border border-grout bg-tile px-2.5 py-1 text-[13px] font-medium text-ink ${className}`}>
+    <span className={`tnum inline-flex items-center gap-1.5 rounded-full bg-glaze-2 px-3 py-1 text-[13px] font-medium text-ink ${className}`}>
       <Ruler size={14} className="text-clay" aria-hidden />
       Tamanho real · {formatDimensions(model.dimensions)}
     </span>

@@ -6,12 +6,12 @@ type Size = 'md' | 'lg' | 'sm';
 
 const base = 'press inline-flex items-center justify-center gap-2 rounded-tile font-medium select-none disabled:pointer-events-none disabled:opacity-45';
 const variants: Record<Variant, string> = {
-  primary: 'bg-clay text-glaze hover:bg-clay-ink shadow-[inset_0_-1px_0_rgb(0_0_0/0.18)]',
-  secondary: 'bg-tile text-ink border border-grout hover:border-grout-2 hover:bg-glaze-2',
+  primary: 'bg-clay text-white hover:bg-clay-ink',
+  secondary: 'bg-tile text-ink border border-grout hover:bg-glaze',
   ghost: 'text-ink hover:bg-glaze-2',
   danger: 'bg-tile text-danger border border-grout hover:border-danger/40 hover:bg-[#fbeeea]',
 };
-const sizes: Record<Size, string> = { sm: 'h-9 px-3 text-sm', md: 'h-11 px-4 text-[15px]', lg: 'h-12 px-5 text-base' };
+const sizes: Record<Size, string> = { sm: 'h-9 px-3 text-sm', md: 'h-11 px-4 text-[15px]', lg: 'h-[52px] px-5 text-[16px] font-semibold' };
 
 export const buttonClass = (variant: Variant = 'primary', size: Size = 'md', extra = '') => `${base} ${variants[variant]} ${sizes[size]} ${extra}`;
 

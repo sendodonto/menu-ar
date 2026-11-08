@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 export const inputClass =
-  'w-full rounded-tile border border-grout bg-tile px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink-3 transition-colors hover:border-grout-2 focus:border-clay focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-clay/20 aria-[invalid=true]:border-danger';
+  'w-full rounded-tile border border-grout bg-tile px-3.5 py-2.5 text-[16px] text-ink placeholder:text-ink-3 transition-colors hover:border-grout-2 focus:border-clay focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-clay/20 aria-[invalid=true]:border-danger';
 
 export function Field({ label, hint, error, children }: { label: string; hint?: string; error?: string | null; children: ReactNode }) {
   return (

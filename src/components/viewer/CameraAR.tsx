@@ -1,24 +1,24 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Camera, Crosshair, Eye, EyeOff, Image as ImageIcon, TriangleAlert } from 'lucide-react';
+import { Camera, Crosshair, Eye, EyeOff, Hand, Plus, Smartphone, TriangleAlert, X } from 'lucide-react';
+import QRCode from 'qrcode';
 import { Button } from '@/components/ui/Button';
 import { useAssetUrl } from '@/hooks/useAssetUrl';
-import { asset } from '@/lib/asset';
-import { formatPrice } from '@/lib/format';
+import { formatDimensions, formatPrice } from '@/lib/format';
+import { useCart } from '@/store/cart';
+import { toast } from '@/store/toast';
 import type { Dish, DishModel } from '@/types/menu';
-import { arHref } from './links';
 
-export type CameraMode = 'cartao' | 'giroscopio';
-type Session = { stop: () => void; setDishVisible: (v: boolean) => void; place?: () => boolean; setTableDrop?: (m: number) => void };
+type Session = { stop: () => void; setDishVisible: (v: boolean) => void; place: () => boolean };
 type Phase = 'intro' | 'starting' | 'running' | 'error';
 
-const HEIGHTS = [{ m: 0.3, label: '30 cm' }, { m: 0.4, label: '40 cm' }, { m: 0.55, label: '55 cm' }];
+const glass = 'glass bg-black/45 text-white backdrop-blur-xl backdrop-saturate-150';
 
-/** Camera-based AR that needs no AR runtime: table-card tracking (6DoF) or gyroscope placement (3DoF). */
-export function CameraAR({ dish, mode }: { dish: Dish & { model: DishModel }; mode: CameraMode }) {
+/** "Na minha mesa": camera + gyroscope, no AR app or Google service needed. */
+export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
   const router = useRouter();
+  const add = useCart((s) => s.add);
   const url = useAssetUrl(dish.model.src);
   const box = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -26,12 +26,12 @@ export function CameraAR({ dish, mode }: { dish: Dish & { model: DishModel }; mo
   const stream = useRef<MediaStream | null>(null);
   const [phase, setPhase] = useState<Phase>('intro');
   const [error, setError] = useState('');
-  const [found, setFound] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [sensor, setSensor] = useState<boolean | null>(null);
-  const [drop, setDrop] = useState(0.4);
   const [hint, setHint] = useState('');
+  const [desktop, setDesktop] = useState(false);
+  const [qr, setQr] = useState('');
 
   const stop = () => {
     session.current?.stop();
@@ -40,118 +40,113 @@ export function CameraAR({ dish, mode }: { dish: Dish & { model: DishModel }; mo
     stream.current = null;
   };
   useEffect(() => stop, []);
-  useEffect(() => { stop(); setPhase('intro'); setFound(false); setPlaced(false); setHidden(false); }, [mode]);
+
+  useEffect(() => {
+    const touch = navigator.maxTouchPoints > 0 || /Android|iPhone|iPad|Mobi/i.test(navigator.userAgent);
+    setDesktop(!touch);
+    if (!touch) QRCode.toString(window.location.href, { type: 'svg', margin: 0, color: { dark: '#1c1a17', light: '#ffffff' } }).then(setQr).catch(() => setQr(''));
+  }, []);
 
   const start = async () => {
     if (!url || !box.current || !video.current) return;
     setPhase('starting');
     setError('');
     try {
-      const { openCamera } = await import('@/lib/ar/stage');
-      if (mode === 'giroscopio') await (await import('@/lib/ar/gyro')).requestMotionPermission();
+      const [{ openCamera }, gyro] = await Promise.all([import('@/lib/ar/stage'), import('@/lib/ar/gyro')]);
+      await gyro.requestMotionPermission();
       stream.current = await openCamera(video.current);
-      session.current = mode === 'cartao'
-        ? await (await import('@/lib/ar/marker')).startMarkerAR(box.current, video.current, url, { onStatus: (s) => setFound(s === 'found') })
-        : await (await import('@/lib/ar/gyro')).startGyroAR(box.current, video.current, url, { onSensor: setSensor });
+      session.current = await gyro.startGyroAR(box.current, video.current, url, {
+        onSensor: setSensor,
+        onPlaced: (ok) => { if (ok) { setPlaced(true); setHint(''); } else setHint('Aponte o celular um pouco mais para baixo, para a mesa.'); },
+      });
       setPhase('running');
     } catch (e) {
       stop();
-      setError(e instanceof Error ? e.message : 'Não foi possível iniciar a câmera.');
+      setError(e instanceof Error ? e.message : 'Não foi possível abrir a câmera.');
       setPhase('error');
     }
   };
 
+  const close = () => { stop(); router.back(); };
   const toggle = () => { session.current?.setDishVisible(hidden); setHidden(!hidden); };
-  const place = () => {
-    const ok = session.current?.place?.();
-    setHint(ok ? '' : 'Aponte o celular para baixo, para a mesa, e toque de novo.');
-    if (ok) { setPlaced(true); setHidden(false); }
-  };
-  const changeDrop = (m: number) => { setDrop(m); session.current?.setTableDrop?.(m); };
-  const leave = () => { stop(); router.push('/'); };
+  const recenter = () => { setHidden(false); session.current?.place(); };
 
-  const running = phase === 'running';
-  const status = mode === 'cartao'
-    ? found ? (hidden ? 'Prato removido' : 'Mova-se em volta: o prato fica sobre o cartão') : 'Procurando o cartão da mesa…'
-    : sensor === false ? 'Este aparelho não informou o giroscópio; o prato não vai acompanhar o movimento.' : placed ? (hidden ? 'Prato removido' : 'Gire o celular para olhar o prato. Modo aproximado.') : 'Aponte para a mesa e toque em Posicionar';
-  const pill = 'pointer-events-auto press inline-flex h-12 items-center gap-2 rounded-tile px-4 text-[15px] font-medium shadow-lift';
+  const status = hint
+    || (sensor === false ? 'Este aparelho não informou o giroscópio: o prato não vai acompanhar o movimento.'
+      : !placed ? 'Aponte a câmera para a mesa'
+        : hidden ? 'Prato removido'
+          : 'Arraste o prato com o dedo para mudar de lugar');
+  const size = dish.model.dimensions ? formatDimensions(dish.model.dimensions) : null;
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-ink text-glaze">
+    <div className="fixed inset-0 overflow-hidden bg-[#1c1a17]">
       <div ref={box} className="absolute inset-0">
         <video ref={video} className="absolute max-w-none" muted playsInline aria-hidden />
       </div>
 
-      <header className="absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-ink/70 px-3 pb-2 pt-[max(env(safe-area-inset-top),10px)]">
-        <Link href={arHref(dish.id)} onClick={stop} className="press grid size-11 place-items-center rounded-tile hover:bg-white/10" aria-label="Voltar">
-          <ArrowLeft size={20} />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <p className="serif truncate text-[20px] leading-tight">{dish.name}</p>
-          <p className="tnum text-[13px] text-glaze/80">{formatPrice(dish.price)} · {mode === 'cartao' ? 'Cartão da mesa' : 'Sem cartão (aproximado)'}</p>
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)]">
+        <div className={`${glass} min-w-0 rounded-2xl px-4 py-2.5`}>
+          <p className="truncate text-[15px] font-semibold leading-tight">{dish.name}</p>
+          <p className="text-[13px] text-white/75">{formatPrice(dish.price)}{size ? ` · ${size}` : ''}</p>
         </div>
-        <Link href={`/mesa/?id=${dish.id}&modo=${mode === 'cartao' ? 'giroscopio' : 'cartao'}`} className="press rounded-tile border border-white/25 px-3 py-2 text-[13px] font-medium hover:bg-white/10">
-          {mode === 'cartao' ? 'Sem cartão' : 'Usar cartão'}
-        </Link>
-      </header>
+        <button type="button" onClick={close} className={`${glass} press grid size-11 shrink-0 place-items-center rounded-full`} aria-label="Fechar e voltar">
+          <X size={20} />
+        </button>
+      </div>
 
-      {running && (
+      {phase === 'running' && (
         <>
-          <p className="absolute inset-x-4 top-[calc(env(safe-area-inset-top)+80px)] z-10 mx-auto max-w-sm rounded-tile bg-ink/80 px-3.5 py-2 text-center text-[14px]" aria-live="polite">
-            {hint || status}
-          </p>
-          {mode === 'giroscopio' && !placed && <Crosshair size={36} className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-glaze/90" aria-hidden />}
-          <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-2 px-4 pb-[max(env(safe-area-inset-bottom),18px)]">
-            {mode === 'giroscopio' && placed && (
-              <div role="group" aria-label="Distância do celular até a mesa" className="flex items-center gap-1 rounded-tile bg-ink/80 p-1 text-[13px]">
-                <span className="px-2 text-glaze/80">Celular a</span>
-                {HEIGHTS.map((h) => (
-                  <button key={h.m} type="button" onClick={() => changeDrop(h.m)} aria-pressed={drop === h.m} className={`press h-9 rounded-[2px] px-2.5 font-medium ${drop === h.m ? 'bg-clay text-glaze' : 'hover:bg-white/10'}`}>{h.label}</button>
-                ))}
-                <span className="px-2 text-glaze/80">da mesa</span>
-              </div>
-            )}
-            <div className="flex flex-wrap justify-center gap-2">
-              {mode === 'giroscopio' && (
-                <button type="button" onClick={place} className={`${pill} bg-clay text-glaze`}><Crosshair size={18} /> {placed ? 'Posicionar de novo' : 'Posicionar aqui'}</button>
+          {!placed && <Crosshair size={40} strokeWidth={1.5} className="pointer-events-none absolute left-1/2 top-[57%] z-10 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow" aria-hidden />}
+          <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 px-4 pb-[max(env(safe-area-inset-bottom),20px)]">
+            <p className={`${glass} rounded-full px-4 py-2 text-center text-[14px]`} aria-live="polite">{status}</p>
+            <div className="flex w-full max-w-sm gap-2">
+              <button type="button" onClick={recenter} className={`${glass} press flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[15px] font-medium`}>
+                <Crosshair size={18} /> Trazer para cá
+              </button>
+              {placed && (
+                <button type="button" onClick={toggle} className={`${glass} press flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[15px] font-medium`}>
+                  {hidden ? <Eye size={18} /> : <EyeOff size={18} />} {hidden ? 'Mostrar' : 'Remover'}
+                </button>
               )}
-              {(mode === 'cartao' ? found : placed) && (
-                <button type="button" onClick={toggle} className={`${pill} bg-tile text-ink`}>{hidden ? <Eye size={18} /> : <EyeOff size={18} />}{hidden ? 'Recolocar prato' : 'Remover prato'}</button>
-              )}
-              <button type="button" onClick={leave} className={`${pill} bg-ink text-glaze ring-1 ring-white/25`}><ArrowLeft size={18} /> Voltar ao cardápio</button>
             </div>
+            <button
+              type="button"
+              onClick={() => { add(dish.id); toast(`${dish.name} adicionado ao pedido`); }}
+              className="press flex h-12 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-white text-[15px] font-semibold text-ink"
+            >
+              <Plus size={18} /> Adicionar ao pedido · {formatPrice(dish.price)}
+            </button>
           </div>
         </>
       )}
 
-      {!running && (
-        <div className="absolute inset-x-0 bottom-0 z-10 bg-glaze px-4 pt-5 pb-[max(env(safe-area-inset-bottom),18px)] text-ink shadow-[var(--shadow-sheet)]">
+      {phase !== 'running' && (
+        <div className="absolute inset-x-0 bottom-0 z-10 rounded-t-[28px] bg-glaze px-5 pt-6 pb-[max(env(safe-area-inset-bottom),20px)] text-ink shadow-[var(--shadow-sheet)]">
           <div className="mx-auto max-w-md">
-            {phase === 'error' ? (
+            {desktop ? (
               <>
-                <p className="flex items-center gap-2 font-medium"><TriangleAlert size={18} className="text-clay" /> Não deu para abrir a câmera</p>
-                <p className="mt-1.5 text-[14px] leading-relaxed text-ink-2">{error}</p>
-                <Button size="lg" className="mt-4 w-full" icon={<Camera size={18} />} onClick={start}>Tentar de novo</Button>
+                <h1 className="font-serif text-[28px] leading-tight">Abra no celular</h1>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink-2">Ver o prato na mesa usa a câmera do celular. Aponte a câmera do seu celular para o código.</p>
+                {qr && <div className="mt-4 size-36 rounded-2xl bg-white p-3" role="img" aria-label="QR code para abrir esta página no celular" dangerouslySetInnerHTML={{ __html: qr }} />}
               </>
-            ) : mode === 'cartao' ? (
+            ) : phase === 'error' ? (
               <>
-                <h1 className="text-[28px] leading-tight">Use o cartão da mesa</h1>
-                <p className="mt-2 text-[15px] leading-relaxed text-ink-2">Deixe o cartão da Casa Nostra deitado na mesa e aponte a câmera para ele. O prato aparece sobre o cartão, no tamanho real, e fica no lugar enquanto você se move. Funciona em qualquer celular, sem instalar nada.</p>
-                <a href={asset('/ar/cartao-alvo.png')} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-[14px] font-medium text-clay-ink underline">
-                  <ImageIcon size={15} /> Sem cartão impresso? Abra o cartão em outra tela
-                </a>
-                <p className="text-[12px] text-ink-3">Na tela, o tamanho do prato acompanha o tamanho do cartão exibido.</p>
-                <Button size="lg" className="mt-4 w-full" icon={<Camera size={18} />} onClick={start} disabled={!url || phase === 'starting'}>
-                  {phase === 'starting' ? 'Abrindo câmera…' : 'Abrir câmera'}
-                </Button>
+                <p className="flex items-center gap-2 text-[17px] font-semibold"><TriangleAlert size={20} className="text-clay" /> Não deu para abrir a câmera</p>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{error}</p>
+                <Button size="lg" className="mt-5 w-full" icon={<Camera size={18} />} onClick={start}>Tentar de novo</Button>
               </>
             ) : (
               <>
-                <h1 className="text-[28px] leading-tight">Ver sem o cartão</h1>
-                <p className="mt-2 text-[15px] leading-relaxed text-ink-2">Segure o celular a uns 40 cm acima da mesa, aponte para onde quer o prato e toque em “Posicionar aqui”. É um modo aproximado: o prato acompanha quando você gira o celular, mas não quando você anda em volta. Para isso, use o cartão da mesa.</p>
-                <Button size="lg" className="mt-4 w-full" icon={<Camera size={18} />} onClick={start} disabled={!url || phase === 'starting'}>
+                <h1 className="font-serif text-[30px] leading-tight">Veja na sua mesa</h1>
+                <ul className="mt-4 grid gap-3 text-[15px] text-ink-2">
+                  <li className="flex gap-3"><Smartphone size={20} className="mt-0.5 shrink-0 text-clay" /> Segure o celular sentado à mesa, uns 40 cm acima dela.</li>
+                  <li className="flex gap-3"><Crosshair size={20} className="mt-0.5 shrink-0 text-clay" /> Aponte para a mesa: o prato aparece ali, em tamanho real aproximado.</li>
+                  <li className="flex gap-3"><Hand size={20} className="mt-0.5 shrink-0 text-clay" /> Gire o celular para olhar e arraste o prato com o dedo.</li>
+                </ul>
+                <Button size="lg" className="mt-6 w-full" icon={<Camera size={18} />} onClick={start} disabled={!url || phase === 'starting'}>
                   {phase === 'starting' ? 'Abrindo câmera…' : 'Abrir câmera'}
                 </Button>
+                <p className="mt-3 text-center text-[13px] text-ink-3">Funciona no navegador, sem instalar nada.</p>
               </>
             )}
           </div>

@@ -1,28 +1,29 @@
 @import 'tailwindcss';
 
-/* Maiolica: tin-glaze ground, terracotta clay body, ramina green, manganese ink, grout hairlines. */
+/* Casa Nostra: warm off-white ground, white surfaces, hairlines, ink text, terracotta for the one primary action. */
 @theme {
   --color-glaze: #f8f7f4;
-  --color-glaze-2: #f1ede6;
-  --color-tile: #fdfcfa;
-  --color-grout: #e4ded3;
-  --color-grout-2: #d3cbbd;
+  --color-glaze-2: #efece6;
+  --color-tile: #ffffff;
+  --color-grout: #e7e2da;
+  --color-grout-2: #d6cfc4;
   --color-clay: #b4532f;
   --color-clay-ink: #8e3d1f;
-  --color-clay-soft: #f3e3da;
+  --color-clay-soft: #f6e8e1;
   --color-ramina: #5e6b2e;
-  --color-ramina-soft: #e8ead9;
-  --color-ink: #2a2420;
-  --color-ink-2: #5b524b;
-  --color-ink-3: #6f665e;
+  --color-ramina-soft: #ecefdf;
+  --color-ink: #1c1a17;
+  --color-ink-2: #5a534c;
+  --color-ink-3: #6f675f;
   --color-danger: #a3271b;
 
   --font-serif: var(--font-bodoni), 'Bodoni 72', Didot, serif;
   --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-tile: 3px;
-  --shadow-lift: 0 1px 2px rgb(42 36 32 / 0.06), 0 10px 28px -14px rgb(42 36 32 / 0.28);
-  --shadow-sheet: 0 -1px 0 rgb(42 36 32 / 0.06), 0 -18px 40px -24px rgb(42 36 32 / 0.35);
+  --radius-tile: 12px;
+  --shadow-lift: 0 1px 2px rgb(28 26 23 / 0.05), 0 8px 24px -12px rgb(28 26 23 / 0.22);
+  --shadow-card: 0 1px 2px rgb(28 26 23 / 0.04), 0 2px 10px -4px rgb(28 26 23 / 0.08);
+  --shadow-sheet: 0 -1px 0 rgb(28 26 23 / 0.05), 0 -16px 40px -24px rgb(28 26 23 / 0.35);
 
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -68,11 +69,18 @@ a { text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 
 .tnum { font-variant-numeric: lining-nums; }
 
-h1, h2, h3, .serif {
+h1, h2, h3 { text-wrap: balance; }
+h1, h2, .serif, .font-serif {
   font-family: var(--font-serif);
   font-optical-sizing: auto;
-  text-wrap: balance;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+}
+
+/* Translucent chrome (Apple material): content scrolls underneath. */
+.material {
+  background: rgb(248 247 244 / 0.78);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
 }
 
 /* Every press settles like a tile pushed into its bed. */
@@ -138,5 +146,6 @@ model-viewer {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .glass { background: var(--color-glaze) !important; backdrop-filter: none !important; }
+  .material { background: var(--color-glaze); backdrop-filter: none; }
+  .glass { background: rgb(28 26 23 / 0.92) !important; backdrop-filter: none !important; }
 }
