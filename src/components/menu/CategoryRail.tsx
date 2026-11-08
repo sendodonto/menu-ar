@@ -77,7 +77,7 @@ export function CategoryRail({ categories, query, onQuery }: Props) {
                   data-cat={c.id}
                   aria-current={active === c.id ? 'true' : undefined}
                   onClick={() => setActive(c.id)}
-                  className={`${chip} inline-flex items-center ${active === c.id ? 'border-clay bg-clay-soft text-clay-ink' : 'border-grout bg-tile text-ink hover:border-grout-2'}`}
+                  className={`${chip} inline-flex items-center ${active === c.id ? 'border-clay bg-clay text-glaze' : 'border-grout bg-tile text-ink hover:border-grout-2'}`}
                 >
                   {c.name}
                 </a>

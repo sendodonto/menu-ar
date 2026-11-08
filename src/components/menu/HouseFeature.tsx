@@ -13,11 +13,12 @@ import { DishPhoto } from './DishPhoto';
 export function HouseFeature({ dish }: { dish: Dish }) {
   const open = useViewer((s) => s.open);
   return (
-    <section aria-labelledby="house-dish" className="page-enter mx-auto grid max-w-6xl border-b border-grout bg-tile sm:mt-6 sm:grid-cols-[1.15fr_1fr] sm:rounded-tile sm:border">
+    <section aria-labelledby="house-dish" className="page-enter mx-auto max-w-6xl sm:mt-6 sm:px-6">
+      <div className="grid border-b border-grout bg-tile sm:grid-cols-[1.15fr_1fr] sm:overflow-hidden sm:rounded-tile sm:border">
       <Link href={dishHref(dish.id)} className="block" tabIndex={-1} aria-hidden>
-        <DishPhoto src={dish.photo} alt="" priority className="aspect-[5/4] sm:aspect-auto sm:h-full sm:min-h-[420px] sm:rounded-l-tile" />
+        <DishPhoto src={dish.photo} alt="" priority className="aspect-[16/11] sm:aspect-auto sm:h-full sm:min-h-[420px]" />
       </Link>
-      <div className="flex flex-col justify-center gap-4 px-4 pb-5 pt-4 sm:p-10">
+      <div className="flex flex-col justify-center gap-3.5 px-4 pb-5 pt-4 sm:gap-4 sm:p-10">
         <div>
           <h2 id="house-dish" className="text-[34px] leading-[1.02] sm:text-5xl">
             <Link href={dishHref(dish.id)} className="hover:text-clay-ink">{dish.name}</Link>
@@ -36,6 +37,8 @@ export function HouseFeature({ dish }: { dish: Dish }) {
         ) : (
           <ButtonLink href={dishHref(dish.id)} size="lg" className="sm:self-start">Ver prato</ButtonLink>
         )}
+        {dish.model && <p className="text-[13px] leading-snug text-ink-3">Com 3D, o prato aparece na sua mesa em tamanho real, pela câmera do celular.</p>}
+      </div>
       </div>
     </section>
   );

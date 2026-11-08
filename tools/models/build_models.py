@@ -68,19 +68,28 @@ def lathe(name, profile, mat, seg=SEG):
 
 
 def glaze():
-    return material('Ceramica', (.93, .915, .88), .14)
+    return material('Ceramica', (.93, .915, .88), .14, tex='plate.png')
+
+
+def planar_uv(o, radius):
+    layer = o.data.uv_layers.new(name='UVMap')
+    for p in o.data.polygons:
+        for li, vi in zip(p.loop_indices, p.vertices):
+            v = o.data.vertices[vi].co
+            layer.data[li].uv = (v.x / radius * .5 + .5, v.y / radius * .5 + .5)
+    return o
 
 
 def plate(radius, depth=.018, well=.62, name='Prato'):
     R = radius
-    return lathe(name, [(0, .0), (R * .55, 0), (R * .58, .004), (R * well, .006), (R * .96, depth), (R, depth + .002),
-                        (R * .995, depth + .005), (R * .97, depth + .004), (R * well, .011), (R * .58, .009), (0, .009)], glaze())
+    return planar_uv(lathe(name, [(0, .0), (R * .55, 0), (R * .58, .004), (R * well, .006), (R * .96, depth), (R, depth + .002),
+                        (R * .995, depth + .005), (R * .97, depth + .004), (R * well, .011), (R * .58, .009), (0, .009)], glaze()), R)
 
 
 def bowl(radius, name='Prato fundo'):
     R = radius
-    return lathe(name, [(0, 0), (R * .5, 0), (R * .53, .004), (R * .6, .026), (R * .72, .04), (R * .98, .045), (R, .048),
-                        (R * .99, .051), (R * .72, .044), (R * .62, .03), (R * .55, .014), (0, .012)], glaze())
+    return planar_uv(lathe(name, [(0, 0), (R * .5, 0), (R * .53, .004), (R * .6, .026), (R * .72, .04), (R * .98, .045), (R, .048),
+                        (R * .99, .051), (R * .72, .044), (R * .62, .03), (R * .55, .014), (0, .012)], glaze()), R)
 
 
 def height_sampler(img_name):
@@ -135,7 +144,7 @@ def export(slug, objs=None):
 def pizza(slug, tex):
     reset(); plate(.17, .012)
     h = height_sampler(f'{tex}_h.png')
-    polar_disc('Pizza', .15, .013, lambda x, y: .004 + .02 * max(0, h(x * .5 + .5, y * .5 + .5) - .45),
+    polar_disc('Pizza', .15, .013, lambda x, y: .004 + .034 * max(0, h(x * .5 + .5, y * .5 + .5) - .5) ** 1.15,
                material('Pizza', rough=.62, tex=f'{tex}.png', normal=f'{tex}_n.png'))
     return export(slug)
 

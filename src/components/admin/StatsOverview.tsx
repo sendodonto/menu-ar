@@ -25,26 +25,29 @@ export function StatsOverview() {
   const active = dishes.filter((d) => d.active);
 
   const cells = [
+    { label: 'Em andamento agora', value: String(open), href: '/admin/pedidos/' },
     { label: 'Pedidos hoje', value: String(today.length) },
     { label: 'Faturamento hoje', value: formatPrice(revenue), note: 'sem taxa de serviço' },
     { label: 'Ticket médio', value: today.length ? formatPrice(Math.round(revenue / today.length)) : '—' },
-    { label: 'Em andamento', value: String(open), href: '/admin/pedidos/' },
     { label: 'Pratos ativos', value: `${active.length} de ${dishes.length}`, href: '/admin/pratos/' },
     { label: 'Com modelo 3D', value: `${active.filter((d) => d.model).length}`, note: 'aparecem com botão 3D e AR' },
   ];
 
   return (
     <div className="grid gap-10">
-      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-tile border border-grout bg-grout md:grid-cols-3">
+      <section aria-labelledby="hoje">
+      <h2 id="hoje" className="text-2xl">Hoje, {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</h2>
+      <dl className="mt-3 divide-y divide-grout overflow-hidden rounded-tile border border-grout bg-tile">
         {cells.map((c) => (
-          <div key={c.label} className="bg-tile p-4 sm:p-5">
-            <dt className="text-[13px] text-ink-3">{c.label}</dt>
-            <dd className="tnum mt-1 text-[26px] font-semibold leading-tight tracking-tight">{c.value}</dd>
-            {c.note && <dd className="mt-0.5 text-[12px] text-ink-3">{c.note}</dd>}
-            {c.href && <dd className="mt-1"><Link href={c.href} className="inline-flex items-center gap-1 text-[13px] font-medium text-clay-ink hover:underline">Abrir <ArrowRight size={13} /></Link></dd>}
+          <div key={c.label} className="flex flex-wrap items-baseline gap-x-3 px-4 py-3">
+            <dt className="w-40 text-[14px] text-ink-2">{c.label}</dt>
+            <dd className="tnum text-[17px] font-semibold">{c.value}</dd>
+            {c.note && <dd className="text-[13px] text-ink-3">{c.note}</dd>}
+            {c.href && <dd className="ml-auto"><Link href={c.href} className="inline-flex items-center gap-1 text-[13px] font-medium text-clay-ink hover:underline">Abrir <ArrowRight size={13} /></Link></dd>}
           </div>
         ))}
       </dl>
+      </section>
 
       <section aria-labelledby="mais-pedidos">
         <h2 id="mais-pedidos" className="text-2xl">Mais pedidos</h2>

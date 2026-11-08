@@ -1,6 +1,5 @@
 'use client';
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { Box } from 'lucide-react';
 import { CartBar } from '@/components/menu/CartBar';
 import { CategoryRail } from '@/components/menu/CategoryRail';
 import { FeaturedStrip } from '@/components/menu/FeaturedStrip';
@@ -49,14 +48,10 @@ export default function MenuPage() {
         ) : (
           <>
             {house && <HouseFeature dish={house} />}
-            <p className="mx-auto flex max-w-6xl items-start gap-2.5 px-4 pt-5 text-[14px] leading-relaxed text-ink-2 sm:px-6">
-              <Box size={16} className="mt-0.5 shrink-0 text-clay" aria-hidden />
-              Pratos marcados com 3D podem ser vistos de todos os ângulos e colocados na sua mesa, em tamanho real, pela câmera do celular.
-            </p>
-            <div className="mt-5">
+            <div className="sm:mt-5">
               <CategoryRail categories={categories.filter((c) => sections.some((s) => s.category.id === c.id))} query={query} onQuery={setQuery} />
             </div>
-            {!q && <FeaturedStrip dishes={dishes.filter((d) => d.featured)} />}
+            {!q && <FeaturedStrip dishes={dishes.filter((d) => d.featured && d.id !== house?.id)} />}
             {sections.length ? (
               sections.map((s) => <MenuSection key={s.category.id} {...s} />)
             ) : (

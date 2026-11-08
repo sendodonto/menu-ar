@@ -49,11 +49,11 @@ export function DishDetail({ dish, category }: { dish: Dish; category?: Category
         </div>
 
         <div className="px-4 pt-4 sm:px-0 sm:pt-0">
-          {category && (
-            <Link href={`/#cat-${category.id}`} className="text-sm font-medium text-clay-ink hover:underline">{category.name}</Link>
-          )}
-          <h1 className="mt-1 text-[38px] leading-[1.02] sm:text-5xl">{dish.name}</h1>
-          <p className="tnum mt-3 text-2xl font-semibold text-clay-ink">{formatPrice(dish.price)}</p>
+          <h1 className="text-[38px] leading-[1.02] sm:text-5xl">{dish.name}</h1>
+          <p className="mt-3 flex flex-wrap items-baseline gap-x-3">
+            <span className="tnum text-2xl font-semibold text-clay-ink">{formatPrice(dish.price)}</span>
+            {category && <Link href={`/#cat-${category.id}`} className="text-sm text-ink-2 underline hover:text-ink">{category.name}</Link>}
+          </p>
           <p className="mt-4 max-w-[60ch] text-[16px] leading-relaxed text-ink-2">{dish.description}</p>
 
           {dish.model && (

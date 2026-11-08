@@ -8,7 +8,7 @@ import { DishPhoto } from './DishPhoto';
 
 export function DishTile({ dish, index = 0 }: { dish: Dish; index?: number }) {
   return (
-    <article className="tile-set group relative flex flex-col bg-tile shadow-[0_0_0_1px_var(--color-grout)]" style={{ '--i': Math.min(index, 8) } as React.CSSProperties}>
+    <article className="tile-set group relative flex flex-col bg-tile shadow-[0_0_0_1px_var(--color-grout),inset_0_-2px_0_var(--color-clay)]" style={{ '--i': Math.min(index, 8) } as React.CSSProperties}>
       <div className="relative">
         <DishPhoto src={dish.photo} alt={dish.name} className="aspect-square transition-transform" sizes="(min-width: 1024px) 25vw, 50vw" />
         {dish.model && (
@@ -25,7 +25,7 @@ export function DishTile({ dish, index = 0 }: { dish: Dish; index?: number }) {
             </Link>
           </h3>
           <p className="tnum mt-1.5 flex flex-wrap items-baseline gap-x-2 text-[13px] text-ink-3">
-            <span className="text-[15px] font-semibold text-clay-ink">{formatPrice(dish.price)}</span>
+            <span className="rounded-[2px] bg-clay-soft px-1.5 py-0.5 text-[14px] font-semibold text-clay-ink">{formatPrice(dish.price)}</span>
             <span>{dish.prepMinutes} min</span>
           </p>
         </div>

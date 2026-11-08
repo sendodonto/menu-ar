@@ -38,7 +38,7 @@ export default function AdminLogin() {
   return (
     <main className="grid min-h-dvh place-items-center px-4 py-10">
       <div className="page-enter w-full max-w-sm">
-        <Link href="/" className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink"><ArrowLeft size={16} /> Voltar ao cardápio</Link>
+        <Link href="/" className="mb-8 flex w-fit items-center gap-1.5 text-sm text-ink-2 hover:text-ink"><ArrowLeft size={16} /> Voltar ao cardápio</Link>
         <CasaNostraMark />
         <h1 className="mt-6 text-[34px] leading-none">Área do restaurante</h1>
         <p className="mt-2 text-[15px] text-ink-2">Pedidos, pratos, preços e modelos 3D.</p>

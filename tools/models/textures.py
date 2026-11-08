@@ -80,7 +80,7 @@ def pizza(name, toppings, seed):
             m = blob(cx, cy, rad, .2 if kind == 'mozz' else .08, int(g.integers(1e6)))
             if kind == 'mozz':
                 c = mix(np.full((N, N, 3), (250, 244, 228.)), (222, 170, 92), np.clip((1 - m) * 3 * (m > 0), 0, 1) * .6 + np.clip((n3 - .7) * 4, 0, 1) * .5 * m)
-                col = mix(col, c, np.clip(m * 1.4, 0, 1)); height = np.maximum(height, .62 + .1 * m)
+                col = mix(col, c, np.clip(m * 1.1, 0, 1) ** 1.5); height = np.maximum(height, .6 + .12 * m)
             elif kind == 'basil':
                 a = g.random() * np.pi
                 lu, lv = (u - cx) * np.cos(a) + (v - cy) * np.sin(a), -(u - cx) * np.sin(a) + (v - cy) * np.cos(a)
@@ -149,6 +149,15 @@ for a, b, kind in layers:
 save('tiramisu_side', col, height, 4)
 cocoa = noise(90, 3, 43)
 save('tiramisu_top', mix(np.full((N, N, 3), (96, 56, 34.)), (54, 30, 18), cocoa), .4 + .6 * cocoa, 3)
+
+# Majolica plate: tin-white glaze, painted terracotta rim band and a ramina hairline, slight brush wobble.
+wob = .006 * (noise(14, 2, 61) - .5)
+glz = mix(np.full((N, N, 3), (246, 243, 236.)), (236, 230, 218), noise(8, 3, 62) * .5)
+band = np.clip((r - (.9 + wob)) / .008, 0, 1) * np.clip(((.975 + wob) - r) / .008, 0, 1)
+line = np.clip(1 - np.abs(r - (.855 + wob)) / .0045, 0, 1)
+glz = mix(glz, (180, 83, 47), band * (.88 + .12 * noise(40, 2, 63)))
+glz = mix(glz, (94, 107, 46), line * .9)
+save('plate', glz)
 
 # Espresso crema: hazel with tiger striping and a pale centre.
 nn = noise(20, 4, 51)
