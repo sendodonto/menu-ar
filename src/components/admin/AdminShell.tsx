@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ExternalLink, LayoutGrid, LogOut, ReceiptText, Tags, UtensilsCrossed } from 'lucide-react';
+import { ExternalLink, LayoutGrid, LogOut, QrCode, ReceiptText, Tags, UtensilsCrossed } from 'lucide-react';
 import { CasaNostraMark } from '@/components/brand/CasaNostraMark';
 import { useSession } from '@/hooks/useSession';
 import { getRepository, isSupabaseConfigured } from '@/services/repository';
@@ -12,6 +12,7 @@ const NAV = [
   { href: '/admin/pedidos/', label: 'Pedidos', icon: ReceiptText },
   { href: '/admin/pratos/', label: 'Pratos', icon: UtensilsCrossed },
   { href: '/admin/categorias/', label: 'Categorias', icon: Tags },
+  { href: '/admin/cartoes/', label: 'Cartões das mesas', icon: QrCode },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -32,8 +33,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const active = (href: string) => path.startsWith(href.replace(/\/$/, ''));
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
-      <aside className="sticky top-0 z-20 border-b border-grout bg-glaze lg:h-dvh lg:border-b-0 lg:border-r">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr] print:block">
+      <aside className="print:hidden sticky top-0 z-20 border-b border-grout bg-glaze lg:h-dvh lg:border-b-0 lg:border-r">
         <div className="flex items-center justify-between px-4 py-3 lg:block lg:px-5 lg:py-6">
           <Link href="/admin/painel/" aria-label="Painel Casa Nostra"><CasaNostraMark compact /></Link>
           <button type="button" onClick={signOut} className="press inline-flex h-10 items-center gap-1.5 rounded-tile px-3 text-sm text-ink-2 hover:bg-glaze-2 lg:hidden">
@@ -63,7 +64,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </aside>
-      <main className="min-w-0 px-4 pb-16 pt-6 sm:px-8 lg:pt-10">{children}</main>
+      <main className="min-w-0 px-4 pb-16 pt-6 sm:px-8 lg:pt-10 print:p-0">{children}</main>
     </div>
   );
 }

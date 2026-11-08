@@ -37,13 +37,18 @@ Pedidos de clientes entram pela função `create_order`, que lê os preços do b
 
 ## Realidade aumentada
 
-Usa o `<model-viewer>` do Google com `ar-modes="webxr scene-viewer quick-look"` e `ar-scale="fixed"`:
+Nenhum modo pede para instalar nada:
 
-- **Android (Chrome + ARCore):** WebXR na própria página, com os botões “Remover prato” e “Voltar ao cardápio”. Se o WebXR não estiver disponível, abre o Scene Viewer.
-- **iPhone/iPad (Safari):** Quick Look. O arquivo USDZ é gerado na hora a partir do GLB.
-- **Sem suporte:** a página avisa e mantém o 3D. No computador, mostra um QR code para abrir no celular.
+- **Cartão da mesa** (padrão no Android e em qualquer celular): a câmera reconhece o cartão impresso da Casa Nostra (MindAR, no próprio navegador) e o prato fica preso sobre ele, no tamanho real, enquanto o cliente se move. Rota `/mesa/?id=…&modo=cartao`.
+- **Sem cartão** (aproximado): câmera + giroscópio. O prato fica no lugar quando o celular gira, mas não acompanha se o cliente andar. Rota `/mesa/?id=…&modo=giroscopio`.
+- **iPhone/iPad:** Quick Look, que já vem no iOS (USDZ gerado a partir do GLB). O cartão também funciona.
+- **AR do Google (WebXR):** aparece só como opção extra quando o Chrome diz que suporta, com o aviso de que pode pedir o Google Play Services para RA. O Scene Viewer foi removido porque sempre pedia essa instalação.
 
-A escala real vem do próprio GLB (metros, base em y = 0). AR precisa de **HTTPS**, então teste pelo link do GitHub Pages, não pelo `localhost` do computador.
+**Cartões das mesas:** no admin, em *Cartões das mesas*, escolha as mesas e imprima em 100% (sem “ajustar à página”). A imagem precisa sair com **10 cm de largura**: a escala do prato é calculada a partir dela. O QR de cada cartão abre o cardápio já com a mesa (`/?mesa=N`).
+
+Trocar a arte do cartão: edite `tools/ar/make_card.py`, rode-o e depois `node tools/ar/compile-target.mjs` com um Edge/Chrome usando a GPU de verdade (sob SwiftShader o alvo não é reconhecido).
+
+Câmera exige **HTTPS**: teste pelo link do GitHub Pages.
 
 ## Modelos 3D
 

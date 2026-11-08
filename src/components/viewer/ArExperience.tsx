@@ -2,9 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Camera, CameraOff, Eye, EyeOff, Hand, Plus, ScanLine, Smartphone, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, Camera, CameraOff, Crosshair, Eye, EyeOff, Hand, Plus, ScanLine, Smartphone, TriangleAlert } from 'lucide-react';
 import QRCode from 'qrcode';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { formatPrice } from '@/lib/format';
 import { useCart } from '@/store/cart';
 import { toast } from '@/store/toast';
@@ -13,9 +13,12 @@ import type { ModelViewerElement } from '@/types/model-viewer';
 import { ModelKind, RealSize } from './ModelBadge';
 import { ModelStage } from './ModelStage';
 
-type Phase = 'loading' | 'ready' | 'unsupported' | 'denied' | 'session' | 'failed';
+type Phase = 'loading' | 'ready' | 'denied' | 'session' | 'failed';
 
-/** Real AR through model-viewer: WebXR on Android Chrome, Scene Viewer as Android fallback, Quick Look on iOS. */
+/**
+ * Entry to "na minha mesa". iOS uses Quick Look (built in). Everywhere else the default is the table-card AR, which
+ * needs no install; Google's WebXR AR is offered only when the browser reports support, since it may ask for ARCore.
+ */
 export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish['model']> } }) {
   const router = useRouter();
   const add = useCart((s) => s.add);
@@ -27,8 +30,18 @@ export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish[
   const [qr, setQr] = useState('');
   const leaving = useRef(false);
 
-  const onLoad = useCallback((el: ModelViewerElement) => {
-    setPhase((p) => (p === 'loading' ? (el.canActivateAR ? 'ready' : 'unsupported') : p));
+  const [platform, setPlatform] = useState<'ios' | 'mobile' | 'desktop'>('mobile');
+  const [webxr, setWebxr] = useState(false);
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    setPlatform(ios ? 'ios' : /Android|Mobi/i.test(ua) ? 'mobile' : 'desktop');
+    const xr = (navigator as Navigator & { xr?: { isSessionSupported: (m: string) => Promise<boolean> } }).xr;
+    xr?.isSessionSupported('immersive-ar').then(setWebxr).catch(() => setWebxr(false));
+  }, []);
+
+  const onLoad = useCallback(() => {
+    setPhase((p) => (p === 'loading' ? 'ready' : p));
   }, []);
 
   useEffect(() => {
@@ -55,9 +68,9 @@ export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish[
   });
 
   useEffect(() => {
-    if (phase !== 'unsupported' || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+    if (platform !== 'desktop') return;
     QRCode.toString(window.location.href, { type: 'svg', margin: 0, color: { dark: '#2A2420', light: '#FDFCFA' } }).then(setQr).catch(() => setQr(''));
-  }, [phase]);
+  }, [platform]);
 
   const launch = async () => {
     try {
@@ -74,7 +87,7 @@ export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish[
   };
 
   const toggleHidden = () => setHidden((h) => !h);
-  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const mesa = (modo: string) => `/mesa/?id=${encodeURIComponent(dish.id)}&modo=${modo}`;
   const overlayBtn = 'press pointer-events-auto inline-flex h-12 items-center gap-2 rounded-tile px-4 text-[15px] font-medium shadow-lift';
 
   return (
@@ -142,14 +155,40 @@ export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish[
 
           {phase === 'loading' && <p className="py-2 text-[15px] text-ink-2">Preparando o modelo em tamanho real…</p>}
 
-          {(phase === 'ready' || phase === 'session') && (
+          {(phase === 'ready' || phase === 'session') && platform === 'ios' && (
             <>
-              <ol className="mb-4 grid gap-1.5 text-[14px] text-ink-2">
-                <li className="flex gap-2"><span className="tnum font-semibold text-clay-ink">1</span> Permita o acesso à câmera quando o navegador pedir.</li>
-                <li className="flex gap-2"><span className="tnum font-semibold text-clay-ink">2</span> Aponte para a mesa e mova o celular devagar.</li>
-                <li className="flex gap-2"><span className="tnum font-semibold text-clay-ink">3</span> Toque na superfície para colocar o prato no tamanho real.</li>
-              </ol>
+              <p className="mb-3 text-[14px] text-ink-2">Abre a câmera do iPhone com o prato no tamanho real. Mova o celular sobre a mesa e toque para posicionar.</p>
               <Button size="lg" className="w-full" icon={<ScanLine size={18} />} onClick={launch}>Abrir câmera e posicionar</Button>
+              <ButtonLink href={mesa('cartao')} variant="secondary" size="md" className="mt-2 w-full" icon={<Camera size={18} />}>Usar o cartão da mesa</ButtonLink>
+            </>
+          )}
+
+          {(phase === 'ready' || phase === 'session') && platform !== 'ios' && (
+            <>
+              {platform === 'desktop' ? (
+                <Notice icon={<Smartphone size={18} />} title="Abra no celular para ver na sua mesa">
+                  A realidade aumentada usa a câmera do celular. Aponte a câmera do seu celular para o código abaixo. Aqui você pode ver o prato em 3D.
+                  {qr && (
+                    <div className="mt-3 flex items-center gap-4">
+                      <div className="size-28 shrink-0 rounded-tile border border-grout bg-tile p-2" aria-label="QR code para abrir esta página no celular" role="img" dangerouslySetInnerHTML={{ __html: qr }} />
+                      <span className="text-[13px] text-ink-3">O código abre esta mesma página no celular.</span>
+                    </div>
+                  )}
+                </Notice>
+              ) : (
+                <p className="mb-3 text-[14px] text-ink-2">Aponte a câmera para o cartão da Casa Nostra que está na mesa: o prato aparece sobre ele, no tamanho real. Não precisa instalar nada.</p>
+              )}
+              <ButtonLink href={mesa('cartao')} size="lg" variant={platform === 'desktop' ? 'secondary' : 'primary'} className={`w-full ${platform === 'desktop' ? 'mt-3' : ''}`} icon={<Camera size={18} />}>
+                {platform === 'desktop' ? 'Testar com a webcam e o cartão' : 'Usar o cartão da mesa'}
+              </ButtonLink>
+              {platform === 'mobile' && (
+                <ButtonLink href={mesa('giroscopio')} variant="secondary" size="md" className="mt-2 w-full" icon={<Crosshair size={18} />}>Sem cartão (modo aproximado)</ButtonLink>
+              )}
+              {platform === 'mobile' && webxr && (
+                <button type="button" onClick={launch} className="press mt-2 w-full rounded-tile px-3 py-2 text-[13px] text-ink-2 underline hover:text-ink">
+                  Usar o AR do Google (pode pedir para instalar o Google Play Services para RA)
+                </button>
+              )}
             </>
           )}
 
@@ -162,22 +201,8 @@ export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish[
 
           {phase === 'failed' && (
             <Notice icon={<TriangleAlert size={18} />} title="Não foi possível abrir a realidade aumentada">
-              Verifique se a câmera foi permitida e se o aparelho tem o Google Play Services para RA (Android) ou o iOS 12 ou mais recente. O modelo 3D continua disponível acima.
+              Verifique se a câmera foi permitida. Você também pode usar o cartão da mesa, que funciona em qualquer celular.
               <Button size="md" variant="secondary" className="mt-3 w-full" onClick={() => setPhase('ready')}>Tentar de novo</Button>
-            </Notice>
-          )}
-
-          {phase === 'unsupported' && (
-            <Notice icon={<Smartphone size={18} />} title={isMobile ? 'Este aparelho não abre realidade aumentada pelo navegador' : 'Abra no celular para ver na sua mesa'}>
-              {isMobile
-                ? 'A realidade aumentada precisa de Android com ARCore (Chrome) ou iPhone/iPad com Safari. Você ainda pode girar e aproximar o prato em 3D aqui.'
-                : 'A realidade aumentada usa a câmera do celular. Aponte a câmera do seu celular para o código abaixo. Aqui você pode ver o prato em 3D.'}
-              {qr && (
-                <div className="mt-3 flex items-center gap-4">
-                  <div className="size-28 shrink-0 rounded-tile border border-grout bg-tile p-2" aria-label="QR code para abrir esta página no celular" role="img" dangerouslySetInnerHTML={{ __html: qr }} />
-                  <span className="text-[13px] text-ink-3">O código abre esta mesma página no celular.</span>
-                </div>
-              )}
             </Notice>
           )}
 

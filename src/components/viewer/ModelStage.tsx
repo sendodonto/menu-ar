@@ -54,7 +54,7 @@ export const ModelStage = forwardRef<ModelViewerElement | null, Props>(function 
           src={url}
           alt={alt}
           ar={ar || undefined}
-          ar-modes="webxr scene-viewer quick-look"
+          ar-modes="webxr quick-look"
           ar-scale="fixed"
           ar-placement="floor"
           camera-controls
