@@ -19,7 +19,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      # mind-ar pulls node-canvas (native) only for its Node compiler; the app never loads it.
+      - run: npm ci --ignore-scripts
       - run: npm test
       - run: npm run build
         env:
