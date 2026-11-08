@@ -20,7 +20,7 @@ export function FeaturedStrip({ dishes }: { dishes: Dish[] }) {
               <DishPhoto src={d.photo} alt={d.name} className="aspect-[4/3]" sizes="(min-width: 640px) 33vw, 68vw" />
               <div className="flex items-baseline justify-between gap-3 p-3.5">
                 <span className="serif text-[19px] leading-tight">{d.name}</span>
-                <span className="tnum shrink-0 text-[15px] font-semibold text-clay-ink">{formatPrice(d.price)}</span>
+                <span className="tnum shrink-0 rounded-[2px] bg-clay-soft px-1.5 py-0.5 text-[14px] font-semibold text-clay-ink">{formatPrice(d.price)}</span>
               </div>
             </Link>
           </li>

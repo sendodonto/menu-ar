@@ -99,7 +99,7 @@ export function ArExperience({ dish }: { dish: Dish & { model: NonNullable<Dish[
         ar
         autoRotate={phase !== 'session'}
         onLoad={onLoad}
-        className="min-h-0 flex-1 bg-[radial-gradient(ellipse_at_50%_60%,#fdfcfa_0%,#f1ede6_70%)]"
+        className="min-h-0 flex-1 bg-glaze-2"
       >
         <span slot="ar-button" hidden />
         <div slot="ar-prompt" className="pointer-events-none rounded-tile bg-ink/85 px-4 py-3 text-center text-[15px] text-glaze">

@@ -66,7 +66,7 @@ export const SEED_DISHES: Dish[] = [
     photo: photo('pizza-margherita'), photoCredit: UNSPLASH, prepMinutes: 15, serves: 2,
     ingredients: ['Massa de fermentação natural', 'Tomate San Marzano', 'Fior di latte', 'Manjericão', 'Azeite extravirgem'],
     allergens: ['Glúten', 'Leite'], featured: true, active: true,
-    model: model('pizza-margherita', 'demo', 34, 34, 2.8),
+    model: model('pizza-margherita', 'demo', 34, 34, 3.2),
   },
   {
     id: 'pizza-diavola', name: 'Pizza Diavola', categoryId: 'pizzas', price: 6900,
@@ -74,7 +74,7 @@ export const SEED_DISHES: Dish[] = [
     photo: photo('pizza-diavola'), photoCredit: UNSPLASH, prepMinutes: 15, serves: 2,
     ingredients: ['Massa de fermentação natural', 'Tomate San Marzano', 'Fior di latte', 'Salame picante', 'Orégano'],
     allergens: ['Glúten', 'Leite'], featured: false, active: true,
-    model: model('pizza-diavola', 'demo', 34, 34, 2.8),
+    model: model('pizza-diavola', 'demo', 34, 34, 3.2),
   },
   {
     id: 'pizza-quattro-formaggi', name: 'Pizza Quattro formaggi', categoryId: 'pizzas', price: 7200,

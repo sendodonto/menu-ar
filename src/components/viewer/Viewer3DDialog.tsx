@@ -42,7 +42,7 @@ export function Viewer3DDialog() {
             </button>
           </header>
 
-          <ModelStage key={dish.id} src={dish.model.src} alt={`Modelo 3D de ${dish.name}`} className="min-h-0 flex-1 bg-[radial-gradient(ellipse_at_50%_60%,#fdfcfa_0%,#f1ede6_70%)]" />
+          <ModelStage key={dish.id} src={dish.model.src} alt={`Modelo 3D de ${dish.name}`} className="min-h-0 flex-1 bg-glaze-2" />
 
           <footer className="flex flex-col gap-3 border-t border-grout px-4 pt-3 pb-[max(env(safe-area-inset-bottom),14px)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
