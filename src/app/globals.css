@@ -1,0 +1,143 @@
+@import 'tailwindcss';
+
+/* Maiolica: tin-glaze ground, terracotta clay body, ramina green, manganese ink, grout hairlines. */
+@theme {
+  --color-glaze: #f8f7f4;
+  --color-glaze-2: #f1ede6;
+  --color-tile: #fdfcfa;
+  --color-grout: #e4ded3;
+  --color-grout-2: #d3cbbd;
+  --color-clay: #b4532f;
+  --color-clay-ink: #8e3d1f;
+  --color-clay-soft: #f3e3da;
+  --color-ramina: #5e6b2e;
+  --color-ramina-soft: #e8ead9;
+  --color-ink: #2a2420;
+  --color-ink-2: #5b524b;
+  --color-ink-3: #6f665e;
+  --color-danger: #a3271b;
+
+  --font-serif: var(--font-bodoni), 'Bodoni 72', Didot, serif;
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-tile: 3px;
+  --shadow-lift: 0 1px 2px rgb(42 36 32 / 0.06), 0 10px 28px -14px rgb(42 36 32 / 0.28);
+  --shadow-sheet: 0 -1px 0 rgb(42 36 32 / 0.06), 0 -18px 40px -24px rgb(42 36 32 / 0.35);
+
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+  accent-color: var(--color-clay);
+  caret-color: var(--color-clay);
+  --settle: 360ms;
+}
+
+html {
+  background: var(--color-glaze);
+  color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-color: var(--color-grout-2) var(--color-glaze);
+  scroll-padding-top: 8.5rem;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: 'ss01';
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-clay-soft);
+  color: var(--color-clay-ink);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-glaze); }
+::-webkit-scrollbar-thumb { background: var(--color-grout-2); border: 3px solid var(--color-glaze); border-radius: 6px; }
+
+:focus-visible {
+  outline: 2px solid var(--color-clay);
+  outline-offset: 2px;
+}
+
+a { text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+
+.tnum { font-variant-numeric: lining-nums; }
+table .tnum, table.tnum { font-variant-numeric: lining-nums tabular-nums; }
+
+h1, h2, h3, .serif {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  text-wrap: balance;
+  letter-spacing: -0.01em;
+}
+
+/* Every press settles like a tile pushed into its bed. */
+.press { transition: transform 160ms var(--ease-out-expo), background-color 160ms, color 160ms, border-color 160ms, box-shadow 160ms; }
+.press:active { transform: scale(0.97); }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Page entry: content is visible by default, only the settle is animated. */
+@keyframes settle-in {
+  from { opacity: 0; transform: translateY(10px); }
+}
+.page-enter { animation: settle-in 420ms var(--ease-out-expo) both; }
+
+@keyframes tile-set {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+}
+.tile-set { animation: tile-set var(--settle) var(--ease-out-expo) both; animation-delay: calc(var(--i, 0) * 45ms); }
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--color-glaze-2) 0%, #f7f4ef 50%, var(--color-glaze-2) 100%) 0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes bump { 40% { transform: scale(1.18); } }
+.bump { animation: bump 420ms var(--ease-settle); }
+
+/* Dialogs enter and leave along the same path. */
+dialog.sheet {
+  transition: opacity 280ms var(--ease-out-expo), transform 360ms var(--ease-out-expo), overlay 360ms allow-discrete, display 360ms allow-discrete;
+  opacity: 0;
+  transform: translateY(24px);
+}
+dialog.sheet[open] { opacity: 1; transform: none; }
+@starting-style { dialog.sheet[open] { opacity: 0; transform: translateY(24px); } }
+dialog.sheet::backdrop {
+  background: rgb(42 36 32 / 0);
+  transition: background-color 280ms, overlay 360ms allow-discrete, display 360ms allow-discrete;
+}
+dialog.sheet[open]::backdrop { background: rgb(42 36 32 / 0.45); }
+@starting-style { dialog.sheet[open]::backdrop { background: rgb(42 36 32 / 0); } }
+
+model-viewer {
+  --poster-color: transparent;
+  --progress-bar-color: transparent;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root { --color-ink-2: #2a2420; --color-ink-3: #3d3530; --color-grout: #a89f92; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--color-glaze) !important; backdrop-filter: none !important; }
+}
