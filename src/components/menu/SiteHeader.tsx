@@ -11,7 +11,7 @@ export function SiteHeader() {
   const n = hydrated ? count : 0;
   return (
     <header className="material sticky top-0 z-30 border-b border-black/[0.06] pt-[env(safe-area-inset-top)]">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
         <Link href="/" aria-label="Casa Nostra, início do cardápio" className="press rounded-lg py-1">
           <CasaNostraMark compact />
         </Link>

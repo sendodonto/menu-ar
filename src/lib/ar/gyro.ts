@@ -71,7 +71,7 @@ function watchDeviceOrientation(target: THREE.Quaternion, got: () => void) {
  * "On my table" without any AR runtime, Pokémon-style: the rear camera is the background, the phone's rotation
  * turns the virtual camera, and the dish rests on an assumed table plane where the user aims or drags it.
  */
-export async function startGyroAR(container: HTMLElement, video: HTMLVideoElement, modelUrl: string, events: { onSensor: (ok: boolean) => void; onPlaced: (ok: boolean) => void }) {
+export async function startGyroAR(container: HTMLElement, video: HTMLVideoElement, modelUrl: string, events: { onSensor: (ok: boolean) => void; onPlaced: (ok: boolean) => void; onDragged: () => void }) {
   const dish = await loadDish(modelUrl);
   const stage = createStage(container);
   const { scene, camera, renderer, sun } = stage;
@@ -114,9 +114,9 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
   });
   const noSensor = setTimeout(() => { if (!ready) events.onSensor(false); }, 2500);
 
-  // Slightly below screen centre, where a seated guest naturally aims at the table.
+  // Just above screen centre, so the whole dish lands clear of the bottom controls.
   const aim = () => {
-    const p = tableAt(0, -0.15);
+    const p = tableAt(0, 0.05);
     if (p) { putAt(p); placed = true; events.onPlaced(true); }
     return !!p;
   };
@@ -136,7 +136,7 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
     const p = tableAt(...toNdc(e));
     if (p) { putAt(p); if (!placed) { placed = true; events.onPlaced(true); } }
   };
-  const up = () => { dragging = false; };
+  const up = () => { if (dragging && placed) events.onDragged(); dragging = false; };
   canvas.addEventListener('pointerdown', down);
   canvas.addEventListener('pointermove', move);
   canvas.addEventListener('pointerup', up);

@@ -48,15 +48,14 @@ export function DishDetail({ dish, category }: { dish: Dish; category?: Category
         </div>
 
         <div className="px-4 pt-5 sm:px-0 sm:pt-2">
-          {category && <Link href={`/#cat-${category.id}`} className="text-[14px] text-ink-3 hover:text-ink">{category.name}</Link>}
-          <h1 className="mt-1 font-serif text-[36px] leading-[1.05] sm:text-5xl">{dish.name}</h1>
-          <p className="tnum mt-3 text-[22px] font-medium">{formatPrice(dish.price)}</p>
+          <h1 className="font-serif text-[36px] leading-[1.05] sm:text-5xl">{dish.name}</h1>
+          <p className="mt-3 flex items-baseline gap-3"><span className="tnum text-[22px] font-medium">{formatPrice(dish.price)}</span>{category && <Link href={`/#cat-${category.id}`} className="text-[14px] text-ink-3 hover:text-ink">{category.name}</Link>}</p>
           <p className="mt-4 max-w-[58ch] text-[16px] leading-relaxed text-ink-2">{dish.description}</p>
 
           {dish.model && (
             <div className="mt-6 overflow-hidden rounded-2xl bg-tile shadow-[var(--shadow-card)]">
               <Link href={arHref(dish.id)} className="group flex items-center gap-4 p-4 transition-colors hover:bg-black/[0.02]">
-                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-clay text-white"><ScanLine size={22} /></span>
+                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-ink text-white"><ScanLine size={22} /></span>
                 <span className="flex-1">
                   <span className="block text-[16px] font-semibold">Ver na minha mesa</span>
                   <span className="block text-[14px] text-ink-2">Pela câmera do celular, em tamanho real</span>

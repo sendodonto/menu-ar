@@ -43,7 +43,7 @@ export function CategoryRail({ categories, query, onQuery }: Props) {
 
   return (
     <nav aria-label="Categorias do cardápio" className="material sticky top-[calc(56px+env(safe-area-inset-top))] z-20 mt-6 border-b border-black/[0.06]">
-      <div className="mx-auto flex h-12 max-w-5xl items-center gap-1 px-2 sm:px-4">
+      <div className="mx-auto flex h-12 max-w-3xl items-center gap-1 px-2 sm:px-4">
         {searching ? (
           <div className="flex w-full items-center gap-1 px-2">
             <label className="relative flex-1">
@@ -65,7 +65,7 @@ export function CategoryRail({ categories, query, onQuery }: Props) {
           </div>
         ) : (
           <>
-            <div ref={rail} className="no-scrollbar flex h-full flex-1 items-stretch overflow-x-auto">
+            <div ref={rail} className="no-scrollbar flex h-full flex-1 items-stretch overflow-x-auto [mask-image:linear-gradient(90deg,#000_calc(100%-32px),transparent)]">
               {categories.map((c) => (
                 <a
                   key={c.id}

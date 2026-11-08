@@ -65,7 +65,7 @@ export function CartView({ dishes }: { dishes: Dish[] }) {
       <section aria-labelledby="itens">
         <div className="flex items-baseline justify-between">
           <h1 id="itens" className="text-[36px] leading-none">Seu pedido</h1>
-          <Link href="/" className="text-sm font-medium text-clay-ink underline">Continuar escolhendo</Link>
+          <Link href="/" className="text-sm font-medium text-ink-2 underline">Continuar escolhendo</Link>
         </div>
         {missing > 0 && <p className="mt-3 text-sm text-danger">{missing} {missing === 1 ? 'prato saiu' : 'pratos saíram'} do cardápio e {missing === 1 ? 'foi removido' : 'foram removidos'} do total.</p>}
         <ul className="mt-5 divide-y divide-grout overflow-hidden rounded-2xl bg-tile shadow-[var(--shadow-card)]">
@@ -91,7 +91,7 @@ export function CartView({ dishes }: { dishes: Dish[] }) {
                   />
                   <div className="mt-2 flex items-center justify-between">
                     <QuantityStepper value={item.qty} onChange={(n) => setQty(item.dishId, n)} label={item.name} />
-                    <button type="button" onClick={() => remove(item.dishId)} className="press inline-flex h-11 items-center gap-1.5 rounded-tile px-3 text-[14px] text-danger hover:bg-[#fbeeea]">
+                    <button type="button" onClick={() => remove(item.dishId)} className="press inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-[14px] text-ink-2 hover:bg-glaze">
                       <Trash2 size={16} aria-hidden /> Remover
                     </button>
                   </div>
@@ -124,7 +124,7 @@ export function CartView({ dishes }: { dishes: Dish[] }) {
               </dt>
               <dd>{formatPrice(serviceFee)}</dd>
             </div>
-            <div className="mt-1 flex justify-between border-t border-grout pt-3 text-lg font-semibold"><dt>Total</dt><dd className="text-clay-ink">{formatPrice(total)}</dd></div>
+            <div className="mt-1 flex justify-between border-t border-grout pt-3 text-lg font-semibold"><dt>Total</dt><dd>{formatPrice(total)}</dd></div>
           </dl>
           <Button size="lg" className="mt-5 w-full" onClick={send} disabled={sending} aria-busy={sending}>
             {sending ? 'Enviando…' : `Enviar pedido · ${formatPrice(total)}`}
@@ -150,7 +150,7 @@ function OrderConfirmation({ code, items, total, table }: { code: string; items:
             <span>{formatPrice(i.unitPrice * i.qty)}</span>
           </li>
         ))}
-        <li className="tnum flex justify-between px-4 py-2.5 font-semibold"><span>Total com serviço</span><span className="text-clay-ink">{formatPrice(total)}</span></li>
+        <li className="tnum flex justify-between px-4 py-2.5 font-semibold"><span>Total com serviço</span><span>{formatPrice(total)}</span></li>
       </ul>
       <ButtonLink href="/" size="lg" className="mt-8 w-full">Voltar ao cardápio</ButtonLink>
     </div>

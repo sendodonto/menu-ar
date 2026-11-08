@@ -10,8 +10,8 @@ export function FeaturedStrip({ dishes }: { dishes: Dish[] }) {
   if (!dishes.length) return null;
   return (
     <section aria-labelledby="destaques" className="pt-8 sm:pt-12">
-      <h2 id="destaques" className="mx-auto mb-3 max-w-5xl px-4 font-serif text-[26px] leading-none sm:px-6 sm:text-3xl">Destaques do chef</h2>
-      <ul className="no-scrollbar mx-auto flex max-w-5xl snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 sm:scroll-px-6 sm:px-6">
+      <h2 id="destaques" className="mx-auto mb-3 max-w-3xl px-4 font-serif text-[26px] leading-none sm:px-6 sm:text-3xl">Destaques do chef</h2>
+      <ul className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-[max(1rem,calc((100vw-48rem)/2+1.5rem))] pb-2 [scroll-padding-inline:max(1rem,calc((100vw-48rem)/2+1.5rem))]">
         {dishes.map((d, i) => (
           <li key={d.id} className="tile-set w-[72%] shrink-0 snap-start sm:w-[300px]" style={{ '--i': i } as React.CSSProperties}>
             <Link href={dishHref(d.id)} className="press group block">

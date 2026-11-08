@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Camera, Crosshair, Eye, EyeOff, Hand, Plus, Smartphone, TriangleAlert, X } from 'lucide-react';
 import QRCode from 'qrcode';
 import { Button } from '@/components/ui/Button';
+import { ModelStage } from './ModelStage';
 import { useAssetUrl } from '@/hooks/useAssetUrl';
 import { formatDimensions, formatPrice } from '@/lib/format';
 import { useCart } from '@/store/cart';
@@ -30,6 +31,7 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
   const [hidden, setHidden] = useState(false);
   const [sensor, setSensor] = useState<boolean | null>(null);
   const [hint, setHint] = useState('');
+  const [dragged, setDragged] = useState(false);
   const [desktop, setDesktop] = useState(false);
   const [qr, setQr] = useState('');
 
@@ -58,6 +60,7 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
       session.current = await gyro.startGyroAR(box.current, video.current, url, {
         onSensor: setSensor,
         onPlaced: (ok) => { if (ok) { setPlaced(true); setHint(''); } else setHint('Aponte o celular um pouco mais para baixo, para a mesa.'); },
+        onDragged: () => setDragged(true),
       });
       setPhase('running');
     } catch (e) {
@@ -75,7 +78,7 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
     || (sensor === false ? 'Este aparelho não informou o giroscópio: o prato não vai acompanhar o movimento.'
       : !placed ? 'Aponte a câmera para a mesa'
         : hidden ? 'Prato removido'
-          : 'Arraste o prato com o dedo para mudar de lugar');
+          : dragged ? '' : 'Arraste o prato com o dedo para mudar de lugar');
   const size = dish.model.dimensions ? formatDimensions(dish.model.dimensions) : null;
 
   return (
@@ -96,40 +99,46 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
 
       {phase === 'running' && (
         <>
-          {!placed && <Crosshair size={40} strokeWidth={1.5} className="pointer-events-none absolute left-1/2 top-[57%] z-10 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow" aria-hidden />}
+          {!placed && <Crosshair size={40} strokeWidth={1.5} className="pointer-events-none absolute left-1/2 top-[47.5%] z-10 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow" aria-hidden />}
           <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center gap-3 px-4 pb-[max(env(safe-area-inset-bottom),20px)]">
-            <p className={`${glass} rounded-full px-4 py-2 text-center text-[14px]`} aria-live="polite">{status}</p>
-            <div className="flex w-full max-w-sm gap-2">
-              <button type="button" onClick={recenter} className={`${glass} press flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[15px] font-medium`}>
-                <Crosshair size={18} /> Trazer para cá
+            {status && <p className={`${glass} rounded-full px-4 py-2 text-center text-[14px]`} aria-live="polite">{status}</p>}
+            <div className="flex w-full max-w-sm items-center gap-2">
+              <button type="button" onClick={recenter} className={`${glass} press grid size-12 shrink-0 place-items-center rounded-full`} aria-label="Trazer o prato para onde o celular aponta" title="Trazer para cá">
+                <Crosshair size={20} />
               </button>
-              {placed && (
-                <button type="button" onClick={toggle} className={`${glass} press flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[15px] font-medium`}>
-                  {hidden ? <Eye size={18} /> : <EyeOff size={18} />} {hidden ? 'Mostrar' : 'Remover'}
-                </button>
-              )}
+              <button type="button" onClick={toggle} disabled={!placed} className={`${glass} press grid size-12 shrink-0 place-items-center rounded-full disabled:opacity-40`} aria-label={hidden ? 'Mostrar o prato' : 'Ocultar o prato'} title={hidden ? 'Mostrar' : 'Ocultar'}>
+                {hidden ? <Eye size={20} /> : <EyeOff size={20} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => { add(dish.id); toast(`${dish.name} adicionado ao pedido`); }}
+                className="press flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-[15px] font-semibold text-ink"
+              >
+                <Plus size={18} /> Adicionar · {formatPrice(dish.price)}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => { add(dish.id); toast(`${dish.name} adicionado ao pedido`); }}
-              className="press flex h-12 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-white text-[15px] font-semibold text-ink"
-            >
-              <Plus size={18} /> Adicionar ao pedido · {formatPrice(dish.price)}
-            </button>
           </div>
         </>
       )}
 
-      {phase !== 'running' && (
+      {desktop && (
+        <div className="absolute inset-0 grid place-items-center bg-glaze px-6 pt-20 pb-10">
+          <div className="grid w-full max-w-4xl items-center gap-8 md:grid-cols-[1.2fr_1fr]">
+            <ModelStage src={dish.model.src} alt={`Modelo 3D de ${dish.name}`} className="aspect-square w-full rounded-[28px] bg-tile shadow-[var(--shadow-card)]" />
+            <div>
+              <h1 className="font-serif text-[34px] leading-tight text-ink">Veja na sua mesa pelo celular</h1>
+              <p className="mt-3 text-[16px] leading-relaxed text-ink-2">A câmera do celular coloca o prato sobre a sua mesa, em tamanho real. Aponte a câmera do seu celular para o código.</p>
+              {qr && <div className="mt-6 size-40 rounded-2xl bg-white p-3 shadow-[var(--shadow-card)]" role="img" aria-label="QR code para abrir esta página no celular" dangerouslySetInnerHTML={{ __html: qr }} />}
+              <p className="mt-4 text-[14px] text-ink-3">Aqui você pode girar e aproximar o prato em 3D.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {phase !== 'running' && !desktop && (
         <div className="absolute inset-x-0 bottom-0 z-10 rounded-t-[28px] bg-glaze px-5 pt-6 pb-[max(env(safe-area-inset-bottom),20px)] text-ink shadow-[var(--shadow-sheet)]">
           <div className="mx-auto max-w-md">
-            {desktop ? (
-              <>
-                <h1 className="font-serif text-[28px] leading-tight">Abra no celular</h1>
-                <p className="mt-2 text-[15px] leading-relaxed text-ink-2">Ver o prato na mesa usa a câmera do celular. Aponte a câmera do seu celular para o código.</p>
-                {qr && <div className="mt-4 size-36 rounded-2xl bg-white p-3" role="img" aria-label="QR code para abrir esta página no celular" dangerouslySetInnerHTML={{ __html: qr }} />}
-              </>
-            ) : phase === 'error' ? (
+            {phase === 'error' ? (
               <>
                 <p className="flex items-center gap-2 text-[17px] font-semibold"><TriangleAlert size={20} className="text-clay" /> Não deu para abrir a câmera</p>
                 <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{error}</p>
@@ -139,9 +148,9 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
               <>
                 <h1 className="font-serif text-[30px] leading-tight">Veja na sua mesa</h1>
                 <ul className="mt-4 grid gap-3 text-[15px] text-ink-2">
-                  <li className="flex gap-3"><Smartphone size={20} className="mt-0.5 shrink-0 text-clay" /> Segure o celular sentado à mesa, uns 40 cm acima dela.</li>
-                  <li className="flex gap-3"><Crosshair size={20} className="mt-0.5 shrink-0 text-clay" /> Aponte para a mesa: o prato aparece ali, em tamanho real aproximado.</li>
-                  <li className="flex gap-3"><Hand size={20} className="mt-0.5 shrink-0 text-clay" /> Gire o celular para olhar e arraste o prato com o dedo.</li>
+                  <li className="flex gap-3"><Smartphone size={20} className="mt-0.5 shrink-0 text-ink-2" /> Segure o celular sentado à mesa, uns 40 cm acima dela.</li>
+                  <li className="flex gap-3"><Crosshair size={20} className="mt-0.5 shrink-0 text-ink-2" /> Aponte para a mesa: o prato aparece ali, em tamanho real aproximado.</li>
+                  <li className="flex gap-3"><Hand size={20} className="mt-0.5 shrink-0 text-ink-2" /> Gire o celular para olhar e arraste o prato com o dedo.</li>
                 </ul>
                 <Button size="lg" className="mt-6 w-full" icon={<Camera size={18} />} onClick={start} disabled={!url || phase === 'starting'}>
                   {phase === 'starting' ? 'Abrindo câmera…' : 'Abrir câmera'}

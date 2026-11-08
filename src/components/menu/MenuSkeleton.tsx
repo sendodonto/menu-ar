@@ -1,6 +1,6 @@
 export function MenuSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Carregando cardápio" className="mx-auto max-w-5xl px-4 pt-7 sm:px-6">
+    <div aria-busy="true" aria-label="Carregando cardápio" className="mx-auto max-w-3xl px-4 pt-7 sm:px-6">
       <div className="skeleton h-10 w-48 rounded-lg" />
       <div className="skeleton mt-3 h-4 w-64 rounded" />
       <div className="mt-8 flex gap-3 overflow-hidden">
