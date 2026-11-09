@@ -17,7 +17,7 @@ npm run build      # gera o site estático em out/
 |---|---|
 | `/` | Cardápio (aceita `/?mesa=12` no QR code da mesa) |
 | `/prato/?id=…` | Detalhes do prato |
-| `/ar/?id=…` | Ver na minha mesa (câmera + giroscópio, girar com o dedo) |
+| `/ar/?id=…` | Ver na minha mesa (AR do sistema, ou prévia 3D na câmera) |
 | `/pedido/` | Carrinho e envio do pedido |
 | `/admin/` | Login da área do restaurante |
 
@@ -37,15 +37,13 @@ Pedidos de clientes entram pela função `create_order`, que lê os preços do b
 
 ## Ver na minha mesa
 
-`/ar/?id=…` abre a câmera traseira e usa o giroscópio do celular (estilo Pokémon GO), sem instalar nada e sem Google Play Services:
+Feito como os cardápios AR do mercado (ARmenu, QReal/Denny's), com o `<model-viewer>`:
 
-- o prato aparece onde o celular aponta na mesa, em tamanho real aproximado (supõe o celular ~40 cm acima da mesa); “Trazer” recoloca onde o celular aponta;
-- **arrastar para os lados gira o prato** (segue o dedo e continua girando com o embalo, como no iOS); **arrastar para cima inclina** para ver de cima;
-- girar o celular mantém o prato no lugar; o filtro One Euro tira o tremor do sensor (mais forte em aparelhos sem giroscópio);
-- no Chrome Android usa o `RelativeOrientationSensor`; no iPhone, `deviceorientation` com a permissão de movimento;
-- no computador mostra o prato em 3D e um QR code para abrir no celular.
+- **Celular com AR do sistema** (Android com ARCore, detectado via WebXR; iPhone/iPad com Quick Look): o prato vai para a mesa em **tamanho real** e **fica no lugar** enquanto a pessoa anda em volta. Não usamos o Scene Viewer, que pede para instalar o Google Play Services em celulares sem suporte.
+- **Celular sem AR do sistema:** “prévia na câmera” — o prato em 3D por cima da imagem da câmera, sem sensores (nada treme). Gira com o dedo para ver todos os lados e de cima, pinça para aproximar. A tela avisa que o prato acompanha a tela, sem fingir que está preso na mesa.
+- **Computador:** prato em 3D + QR code para abrir no celular.
 
-Limite: sem ARCore/ARKit o celular não “enxerga” a mesa, então o prato não acompanha se a pessoa andar em volta; para ver os lados, gira-se o prato com o dedo. (Testamos o 8th Wall, que rastreia a mesa pela câmera, mas em celular simples ficou travado e escorregando; foi removido.)
+Histórico: testamos modo giroscópio e o 8th Wall (SLAM no navegador); em celular sem ARCore ambos tremiam/escorregavam e foram removidos.
 
 Câmera exige **HTTPS**: teste pelo link do GitHub Pages.
 

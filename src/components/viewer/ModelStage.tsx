@@ -9,6 +9,8 @@ type Props = {
   src: string;
   alt: string;
   autoRotate?: boolean;
+  /** Enables the phone's system AR (WebXR on ARCore phones, Quick Look on iOS) at real scale. */
+  ar?: boolean;
   className?: string;
   children?: ReactNode;
   onLoad?: (el: ModelViewerElement) => void;
@@ -16,7 +18,7 @@ type Props = {
 
 /** <model-viewer> with a real progress readout and an error state. Children are passed as model-viewer slots. */
 export const ModelStage = forwardRef<ModelViewerElement | null, Props>(function ModelStage(
-  { src, alt, autoRotate = true, className = '', children, onLoad },
+  { src, alt, autoRotate = true, ar = false, className = '', children, onLoad },
   ref,
 ) {
   const url = useAssetUrl(src);
@@ -52,6 +54,10 @@ export const ModelStage = forwardRef<ModelViewerElement | null, Props>(function 
           ref={el as never}
           src={url}
           alt={alt}
+          ar={ar || undefined}
+          ar-modes={ar ? 'webxr quick-look' : undefined}
+          ar-scale={ar ? 'fixed' : undefined}
+          ar-placement={ar ? 'floor' : undefined}
           camera-controls
           touch-action="pan-y"
           auto-rotate={autoRotate || undefined}
