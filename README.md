@@ -17,7 +17,7 @@ npm run build      # gera o site estático em out/
 |---|---|
 | `/` | Cardápio (aceita `/?mesa=12` no QR code da mesa) |
 | `/prato/?id=…` | Detalhes do prato |
-| `/ar/?id=…` | Ver na minha mesa (câmera + giroscópio) |
+| `/ar/?id=…` | Ver na minha mesa (8th Wall SLAM, reserva giroscópio) |
 | `/pedido/` | Carrinho e envio do pedido |
 | `/admin/` | Login da área do restaurante |
 
@@ -37,14 +37,17 @@ Pedidos de clientes entram pela função `create_order`, que lê os preços do b
 
 ## Ver na minha mesa
 
-`/ar/?id=…` abre a câmera traseira e usa o giroscópio do celular (estilo Pokémon GO), sem instalar nada e sem Google Play Services:
+`/ar/?id=…` abre a câmera e coloca o prato na mesa, sem instalar nada e sem Google Play Services:
 
-- o prato aparece onde o celular aponta na mesa, em tamanho real aproximado (assume o celular ~40 cm acima da mesa);
-- arrastar com o dedo move o prato pela mesa; girar o celular mantém o prato no lugar;
-- no Chrome Android usa o `RelativeOrientationSensor` (só giroscópio, sem bússola, sem “pulos”), com suavização; no iPhone usa `deviceorientation` com a permissão de movimento;
-- no computador mostra um QR code para abrir no celular.
+- **Rastreamento de mundo (padrão):** usa o motor SLAM do **8th Wall** (Niantic Spatial), servido de `public/xr/`. O celular entende a mesa pela câmera, então o prato fica **fixo no lugar** enquanto você anda em volta, chega perto ou olha de cima. Arrastar com o dedo move o prato; “Trazer” recoloca onde o celular aponta.
+- **Reserva automática:** se o motor não rodar no aparelho, cai no modo câmera + giroscópio (só giro, com filtro anti-tremor).
+- No computador, mostra o prato em 3D e um QR code para abrir no celular.
 
-Limite: sem ARCore/ARKit o celular não “enxerga” a mesa, então o prato não acompanha se a pessoa andar em volta. Câmera exige **HTTPS**: teste pelo link do GitHub Pages.
+Escala: o 8th Wall supõe o celular a ~40 cm da mesa ao começar, então o tamanho é aproximado.
+
+**Licença do 8th Wall:** o motor é grátis e permite uso comercial, **exceto** em produto cobrado cujo valor venha principalmente dessa função de AR ([XR Engine License Agreement](public/xr/LICENSE.txt), seção 1.2). A tela de AR exibe o crédito exigido (Niantic Spatial, copyright, link da licença e aviso de ausência de garantia). Antes de vender o cardápio AR como produto pago, avalie trocar por uma solução licenciada (ex.: Zappar) ou pelo AR nativo (ARCore/ARKit).
+
+Câmera exige **HTTPS**: teste pelo link do GitHub Pages.
 
 **QR das mesas:** no admin, gere e imprima o QR de cada mesa; ele abre o cardápio já com o número da mesa (`/?mesa=N`).
 

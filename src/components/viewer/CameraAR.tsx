@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import { Button } from '@/components/ui/Button';
 import { ModelStage } from './ModelStage';
 import { useAssetUrl } from '@/hooks/useAssetUrl';
+import { asset } from '@/lib/asset';
 import { formatDimensions, formatPrice } from '@/lib/format';
 import { useCart } from '@/store/cart';
 import { toast } from '@/store/toast';
@@ -16,12 +17,18 @@ type Phase = 'intro' | 'starting' | 'running' | 'error';
 
 const glass = 'glass bg-black/45 text-white backdrop-blur-xl backdrop-saturate-150';
 
-/** "Na minha mesa": camera + gyroscope, no AR app or Google service needed. */
+/**
+ * "Na minha mesa" without any AR app or Google service. Primary: 8th Wall world tracking (dish stays fixed while the
+ * guest walks around). Fallback when the engine can't run on the device: camera + gyroscope (rotation only).
+ */
 export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
   const router = useRouter();
   const add = useCart((s) => s.add);
   const url = useAssetUrl(dish.model.src);
   const box = useRef<HTMLDivElement>(null);
+  const xrCanvas = useRef<HTMLCanvasElement>(null);
+  const [mode, setMode] = useState<'world' | 'gyro'>('world');
+  const [tracking, setTracking] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const session = useRef<Session | null>(null);
   const stream = useRef<MediaStream | null>(null);
@@ -49,13 +56,13 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
     if (!touch) QRCode.toString(window.location.href, { type: 'svg', margin: 0, color: { dark: '#1c1a17', light: '#ffffff' } }).then(setQr).catch(() => setQr(''));
   }, []);
 
-  const start = async () => {
+  const fail = (message: string) => { stop(); setError(message); setPhase('error'); };
+
+  // Fallback view: camera + gyroscope (rotation only).
+  const startGyro = async () => {
     if (!url || !box.current || !video.current) return;
-    setPhase('starting');
-    setError('');
     try {
       const [{ openCamera }, gyro] = await Promise.all([import('@/lib/ar/stage'), import('@/lib/ar/gyro')]);
-      await gyro.requestMotionPermission();
       stream.current = await openCamera(video.current);
       session.current = await gyro.startGyroAR(box.current, video.current, url, {
         onSensor: setSensor,
@@ -64,9 +71,31 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
       });
       setPhase('running');
     } catch (e) {
-      stop();
-      setError(e instanceof Error ? e.message : 'Não foi possível abrir a câmera.');
-      setPhase('error');
+      fail(e instanceof Error ? e.message : 'Não foi possível abrir a câmera.');
+    }
+  };
+  const toGyro = () => { stop(); setMode('gyro'); setPlaced(false); startGyro(); };
+
+  const start = async () => {
+    if (!url || !box.current || !video.current || !xrCanvas.current) return;
+    // iOS only grants motion sensors from inside the tap, before any await.
+    const perms = [window.DeviceMotionEvent, window.DeviceOrientationEvent].map((E) => (E as unknown as { requestPermission?: () => Promise<string> })?.requestPermission?.());
+    setPhase('starting');
+    setError('');
+    if ((await Promise.all(perms.map((p) => p?.catch(() => 'denied')))).includes('denied')) return fail('Permita o acesso ao movimento do aparelho para ver o prato na mesa.');
+    if (mode === 'gyro') return startGyro();
+    try {
+      const world = await import('@/lib/ar/world');
+      session.current = await world.startWorldAR(xrCanvas.current, url, {
+        onTracking: setTracking,
+        onPlaced: () => { setPlaced(true); setHint(''); },
+        onDragged: () => setDragged(true),
+        onError: fail,
+        onUnsupported: toGyro,
+      });
+      setPhase('running');
+    } catch {
+      toGyro(); // engine missing or device not supported
     }
   };
 
@@ -75,7 +104,9 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
   const recenter = () => { setHidden(false); session.current?.place(); };
 
   const status = hint
-    || (sensor === false ? 'Este aparelho não informou o giroscópio: o prato não vai acompanhar o movimento.'
+    || (mode === 'world' && !tracking ? 'Mova o celular devagar mostrando a mesa'
+      : mode === 'world' && placed && !hidden && !dragged ? 'Ande em volta: o prato fica no lugar. Arraste para mover.'
+      : sensor === false ? 'Este aparelho não informou o giroscópio: o prato não vai acompanhar o movimento.'
       : !placed ? 'Aponte a câmera para a mesa'
         : hidden ? 'Prato removido'
           : dragged ? '' : 'Arraste o prato com o dedo para mudar de lugar');
@@ -86,6 +117,7 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
       <div ref={box} className="absolute inset-0">
         <video ref={video} className="absolute max-w-none" muted playsInline aria-hidden />
       </div>
+      <canvas ref={xrCanvas} className={`absolute inset-0 size-full ${mode === 'world' && phase === 'running' ? '' : 'invisible'}`} aria-hidden />
 
       <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-3 px-4 pt-[max(env(safe-area-inset-top),12px)]">
         <div className={`${glass} min-w-0 rounded-2xl px-4 py-2.5 ${desktop ? 'invisible' : ''}`}>
@@ -117,6 +149,12 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
                 <Plus size={18} /> Adicionar · {formatPrice(dish.price)}
               </button>
             </div>
+            {mode === 'world' && (
+              <p className="text-center text-[10px] leading-snug text-white/70">
+                AR por 8th Wall Engine, criado pela Niantic Spatial, Inc. © Niantic Spatial. Uso sob o{' '}
+                <a href={asset('/xr/LICENSE.txt')} target="_blank" rel="noreferrer" className="underline">XR Engine License Agreement</a>, sem garantias.
+              </p>
+            )}
           </div>
         </>
       )}
@@ -149,9 +187,9 @@ export function CameraAR({ dish }: { dish: Dish & { model: DishModel } }) {
               <>
                 <h1 className="font-serif text-[30px] leading-tight">Veja na sua mesa</h1>
                 <ul className="mt-4 grid gap-3 text-[15px] text-ink-2">
-                  <li className="flex gap-3"><Smartphone size={20} className="mt-0.5 shrink-0 text-ink-2" /> Segure o celular sentado à mesa, uns 40 cm acima dela.</li>
-                  <li className="flex gap-3"><Crosshair size={20} className="mt-0.5 shrink-0 text-ink-2" /> Aponte para a mesa: o prato aparece ali, em tamanho real aproximado.</li>
-                  <li className="flex gap-3"><Hand size={20} className="mt-0.5 shrink-0 text-ink-2" /> Gire o celular para olhar e arraste o prato com o dedo.</li>
+                  <li className="flex gap-3"><Smartphone size={20} className="mt-0.5 shrink-0 text-ink-2" /> Sentado, segure o celular uns 40 cm acima da mesa e aponte para ela.</li>
+                  <li className="flex gap-3"><Crosshair size={20} className="mt-0.5 shrink-0 text-ink-2" /> Mova o celular devagar até o prato aparecer, em tamanho real aproximado.</li>
+                  <li className="flex gap-3"><Hand size={20} className="mt-0.5 shrink-0 text-ink-2" /> Ande em volta e chegue perto: o prato fica no lugar. Arraste para mover.</li>
                 </ul>
                 <Button size="lg" className="mt-6 w-full" icon={<Camera size={18} />} onClick={start} disabled={!url || phase === 'starting'}>
                   {phase === 'starting' ? 'Abrindo câmera…' : 'Abrir câmera'}
