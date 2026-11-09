@@ -75,8 +75,15 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
   const dish = await loadDish(modelUrl);
   const stage = createStage(container);
   const { scene, camera, renderer, sun } = stage;
-  dish.group.visible = false;
-  scene.add(dish.group);
+  // holder: where the dish sits on the table, facing the guest. tilt/spin: the guest's turntable gesture.
+  const holder = new THREE.Group();
+  const tiltG = new THREE.Group();
+  const spinG = new THREE.Group();
+  spinG.add(dish.group);
+  tiltG.add(spinG);
+  holder.add(tiltG);
+  holder.visible = false;
+  scene.add(holder);
   sun.position.set(0.4, 1.5, 0.6);
 
   const layout = () => {
@@ -99,9 +106,9 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
     return ray.ray.intersectPlane(table, hit) ? hit.clone() : null;
   };
   const putAt = (p: THREE.Vector3) => {
-    dish.group.position.copy(p);
-    dish.group.rotation.y = Math.atan2(p.x, p.z) + Math.PI; // front of the dish faces the guest
-    dish.group.visible = true;
+    holder.position.copy(p);
+    holder.rotation.y = Math.atan2(-p.x, -p.z); // local +Z points back at the guest (camera at the origin)
+    holder.visible = true;
   };
 
   const target = new THREE.Quaternion();
@@ -125,21 +132,41 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
   };
   const place = () => aim() || (events.onPlaced(false), false);
 
-  // Drag with one finger: the dish follows the finger across the table (direct manipulation, 1:1).
+  // Turntable gesture (Apple-style direct manipulation): sideways drag spins the dish 1:1 and keeps spinning with the
+  // finger's momentum after release; vertical drag tips the dish toward the guest to see it from above.
+  const SPIN_PER_PX = 0.012;
+  const TILT_PER_PX = 0.008;
+  const MAX_TILT = 0.9; // rad, ~50°: with the phone already looking down, that is close to a top view
+  const MAX_SPIN_SPEED = 12; // rad/s, about two turns per second
+  let spin = 0;
+  let spinVelocity = 0; // rad/s
+  let tilt = 0;
+  let pointer: { id: number; x: number; y: number; history: { t: number; x: number }[] } | null = null;
   const canvas = renderer.domElement;
   canvas.style.touchAction = 'none';
-  let dragging = false;
-  const toNdc = (e: PointerEvent) => {
-    const b = canvas.getBoundingClientRect();
-    return [((e.clientX - b.left) / b.width) * 2 - 1, -((e.clientY - b.top) / b.height) * 2 + 1] as const;
+  const down = (e: PointerEvent) => {
+    if (pointer || !placed) return;
+    canvas.setPointerCapture(e.pointerId);
+    pointer = { id: e.pointerId, x: e.clientX, y: e.clientY, history: [{ t: e.timeStamp, x: e.clientX }] };
+    spinVelocity = 0; // grabbing stops the spin, like a real turntable
   };
-  const down = (e: PointerEvent) => { dragging = true; canvas.setPointerCapture(e.pointerId); move(e); };
   const move = (e: PointerEvent) => {
-    if (!dragging) return;
-    const p = tableAt(...toNdc(e));
-    if (p) { putAt(p); if (!placed) { placed = true; events.onPlaced(true); } }
+    if (!pointer || e.pointerId !== pointer.id) return;
+    spin += (e.clientX - pointer.x) * SPIN_PER_PX;
+    tilt = THREE.MathUtils.clamp(tilt - (e.clientY - pointer.y) * TILT_PER_PX, 0, MAX_TILT);
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    pointer.history = [...pointer.history.slice(-4), { t: e.timeStamp, x: e.clientX }];
   };
-  const up = () => { if (dragging && placed) events.onDragged(); dragging = false; };
+  const up = (e: PointerEvent) => {
+    if (!pointer || e.pointerId !== pointer.id) return;
+    const h = pointer.history;
+    const first = h[0], last = h[h.length - 1];
+    const dt = (last.t - first.t) / 1000;
+    if (dt > 0.01 && e.timeStamp - last.t < 80) spinVelocity = THREE.MathUtils.clamp(((last.x - first.x) * SPIN_PER_PX) / dt, -MAX_SPIN_SPEED, MAX_SPIN_SPEED);
+    pointer = null;
+    events.onDragged();
+  };
   canvas.addEventListener('pointerdown', down);
   canvas.addEventListener('pointermove', move);
   canvas.addEventListener('pointerup', up);
@@ -147,18 +174,24 @@ export async function startGyroAR(container: HTMLElement, video: HTMLVideoElemen
 
   let last = performance.now();
   renderer.setAnimationLoop((now: number) => {
-    const dt = (now - last) / 1000;
+    const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
     if (ready) {
       filter.step(camera.quaternion, target, dt);
       if (!placed) aim(); // appear as soon as the phone points at the table
     }
+    if (!pointer && Math.abs(spinVelocity) > 0.01) {
+      spin += spinVelocity * dt;
+      spinVelocity *= Math.pow(0.998, dt * 1000); // same deceleration as iOS scrolling
+    }
+    spinG.rotation.y = spin;
+    tiltG.rotation.x = tilt; // pivots on the plate's centre so its distance (and apparent size) stays put
     renderer.render(scene, camera);
   });
 
   return {
     place,
-    setDishVisible: (v: boolean) => { dish.group.visible = v && placed; },
+    setDishVisible: (v: boolean) => { holder.visible = v && placed; },
     stop() {
       clearTimeout(noSensor);
       stopOrientation();
