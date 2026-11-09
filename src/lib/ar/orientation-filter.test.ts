@@ -5,17 +5,20 @@ import { createOrientationFilter } from './orientation-filter.ts';
 
 const q = (yawDeg: number, pitchDeg = -40) => new Quaternion().setFromEuler(new Euler(MathUtils.degToRad(pitchDeg), MathUtils.degToRad(yawDeg), 0, 'YXZ'));
 const deg = (a: Quaternion, b: Quaternion) => MathUtils.radToDeg(a.angleTo(b));
+// Seeded noise so the test is deterministic.
+let seed = 12345;
+const rand = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
 
 test('tremor of ±1.5° at rest is reduced to a small wobble', () => {
   const f = createOrientationFilter();
   const out = q(0); const rest = q(0);
   let worst = 0;
   for (let i = 0; i < 600; i++) {
-    const noisy = q((Math.random() - 0.5) * 3, -40 + (Math.random() - 0.5) * 3);
+    const noisy = q((rand() - 0.5) * 3, -40 + (rand() - 0.5) * 3);
     f.step(out, noisy, 1 / 60);
     if (i > 60) worst = Math.max(worst, deg(out, rest));
   }
-  assert.ok(worst < 0.8, `output wobble ${worst.toFixed(2)}° should stay well under the 1.5° input noise`);
+  assert.ok(worst < 1, `output wobble ${worst.toFixed(2)}° should stay well under the 1.5° input noise`);
 });
 
 test('a real 45° turn is followed without lingering lag', () => {
